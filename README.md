@@ -3,7 +3,9 @@
 ## About
  This bachelor project is aiming to generate fair teams for an annual church camp based on the skills that the users have inputted themselves through a Google form.
 
-The algorithm is to output five teams with the use of the different constraints it has been given. 
+The algorithm is to output five teams with the use of the different constraints it has been given.
+
+You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-form)
 
 
 ## How to start the project
@@ -58,7 +60,7 @@ python3 -m venv venv
   <summary>📌 Click to expand branch categories</summary>
 
 - **feature/** → New feature development  
-- **bugfix/** → Fixing bugs in development  
+- **debug/** → Fixing bugs in development  
 - **improvement/** → Enhancements and optimizations  
 - **refactor/** → Code refactoring without changing functionality  
 - **docs/** → Documentation updates  

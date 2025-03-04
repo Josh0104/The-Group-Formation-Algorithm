@@ -1,7 +1,5 @@
-import csv
+import pandas as pd
 
-def read_csv(file_path):
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            print(row)
+df = pd.read_csv('data/users.csv')
+
+print(df.to_string()) 
