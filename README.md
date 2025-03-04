@@ -43,3 +43,12 @@ venv\Scripts\python.exe main.py
 ```bash
 deactivate
 ```
+
+
+# Additional Notes
+
+To create a virtual environment, run the following command
+```bash
+python3 -m venv venv
+```
+

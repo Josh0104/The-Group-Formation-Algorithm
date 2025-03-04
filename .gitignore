@@ -1,3 +1,9 @@
+# Ignore all files in /data directory, this is where user data will be stored
+/data/*
+
+# Except for the /data/test* files, these are used for testing
+!/data/test*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
