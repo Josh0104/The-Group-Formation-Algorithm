@@ -52,3 +52,19 @@ To create a virtual environment, run the following command
 python3 -m venv venv
 ```
 
+# For the developers of the project
+
+## Branch Naming Convention
+<details>
+  <summary>📌 Click to expand branch categories</summary>
+
+- **feature/** → New feature development  
+- **bugfix/** → Fixing bugs in development  
+- **improvement/** → Enhancements and optimizations  
+- **refactor/** → Code refactoring without changing functionality  
+- **docs/** → Documentation updates  
+- **experiment/** → Experimental features or prototypes  
+- **test/** → Adding or improving tests  
+- **release/** → Preparing a new software release  
+
+</details>
