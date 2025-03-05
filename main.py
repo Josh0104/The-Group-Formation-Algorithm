@@ -1,10 +1,17 @@
-# import mip
 import csv_reader as cr
-import math
-num = 4
-print(math.sqrt(num))
-print("hello world")
-a = 2
-b = 5
+import csv_schema as cs
 
-cr.read_csv("data/users.csv")
+print("Good bye")
+def main():
+    print("hello world")
+    cr.read_csv("data/users.csv")
+    cr.read_csv(None)
+    str = "qwerty"
+    if str == "qwerty":
+        print("qwerty")
+
+    cr.read_csv_pd("data/users.csv")
+    #print(cs.columns["first_name"])
+
+if __name__ == "__main__":
+    main()
