@@ -26,8 +26,7 @@ def read_csv_pd(file_path):
     
     result = filtered_names[["First name", "Last name"]]
     print(type(result))
-    print(result)
-    # Print each matching name
-    #for name in filtered_names:
-        #print(name)
+    #Print each matching name
+    for name in filtered_names:
+        print(name)
 
