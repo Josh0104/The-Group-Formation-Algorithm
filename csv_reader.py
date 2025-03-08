@@ -4,7 +4,7 @@ import csv_schema as schema
 
 default_file_path = 'data/users.csv'
 
-def read_csv(file_path):
+def read_csv(file_path) -> None:
     print(type(file_path))
     if file_path == None:
         file_path = default_file_path
