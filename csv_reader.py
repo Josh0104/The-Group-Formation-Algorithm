@@ -29,4 +29,3 @@ def read_csv_pd(file_path):
     for name in result.iterrows():
         n = name
         print(n[1][0] + " " + n[1][1])
-
