@@ -51,5 +51,5 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         n = name
         print(n[1][0] + " " + n[1][1])
 
-    p1 = Person.Person(1, "John", "Doe")
+    p1 = Person.Person(1, "John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
     return {"id": p1}
