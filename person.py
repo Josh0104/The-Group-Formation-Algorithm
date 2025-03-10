@@ -2,8 +2,9 @@ from datetime import date
 from enum import Enum
 
 class Person :
-    def __init__(self, id, name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
+    def __init__(self, id, uuid, name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
         self.id = id
+        self.uuid = uuid
         self.name = name
         self.birthday = birthday
         self.gender = gender
