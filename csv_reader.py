@@ -44,34 +44,28 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         schema.columns["q10"], # 15
         ]]
 
-    j = 0
     dictPersons = {}
     for i, row  in result.iterrows():
-        j += 1
-        if j > 10:
-            break
-        print(i)
-        print("0 "+row.iloc[0])
-        print("1 "+row.iloc[1])
-        print("2 "+row.iloc[2])
-        print("3 "+row.iloc[3])
-        print("4 "+row.iloc[4])
-        print("5 "+row.iloc[5])
-        print("6 "+row.iloc[6])
-        print("7 "+row.iloc[7])
-        print("8 "+row.iloc[8])
-        print("9 "+row.iloc[9])
-        print("10 "+row.iloc[10])
-        print("11 "+row.iloc[11])
-        print("12 "+row.iloc[12])
-        print("13 "+row.iloc[13])
-        print("14 "+row.iloc[14] if str(row.iloc[14]) != "nan" else "14")
-        print("15 "+ row.iloc[15] if str(row.iloc[15]) != "nan" else "15")
 
         uuid = row.iloc[0]
         first_name = row.iloc[1]
+        last_name = row.iloc[2]
+        birthday = row.iloc[3]
+        gender = row.iloc[4]
+        country = row.iloc[5]
+        a1 = row.iloc[6]
+        a2 = row.iloc[7]
+        a3 = row.iloc[8]
+        a4 = row.iloc[9]
+        a5 = row.iloc[10]
+        a6 = row.iloc[11]
+        a7 = row.iloc[12]
+        a8 = row.iloc[13]
+        a9 = row.iloc[14] if str(row.iloc[14]) != "nan" else ""
+        a10 = row.iloc[15] if str(row.iloc[15]) != "nan" else ""
 
-        dictPersons[row.iloc[1]] = Person.Person(row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5], row.iloc[6], row.iloc[7], row.iloc[8], row.iloc[9], row.iloc[10], row.iloc[11], row.iloc[12], row.iloc[13], row.iloc[14], row.iloc[15], row.iloc[16])
+        dictPersons[row.iloc[1]] = Person.Person(
+        i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
 
     return dictPersons
     # p1 = Person.Person(1, "1234","John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
