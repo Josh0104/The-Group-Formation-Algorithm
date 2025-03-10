@@ -22,7 +22,7 @@ venv\Scripts\activate
 
 Then run the python script
 ```bash
-python main.py
+python3 main.py
 ```
 
 ### Alternative method 
