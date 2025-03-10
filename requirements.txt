@@ -1,0 +1,13 @@
+Package         Version
+--------------- -----------
+cffi            1.15.1
+mip             1.15.0
+numpy           2.2.3
+pandas          2.2.3
+pip             24.3.1
+pycparser       2.22
+python-dateutil 2.9.0.post0
+pytz            2025.1
+setuptools      75.6.0
+six             1.17.0
+tzdata          2025.1
