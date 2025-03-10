@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 
 class Person :
@@ -7,7 +7,8 @@ class Person :
         self.uuid = uuid
         self.first_name = first_name
         self.last_name = last_name
-        self.birthday = birthday
+        self.name = first_name + " " + last_name
+        self.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
         self.gender = gender
         self.country = country
         self.a1 = a1
@@ -21,12 +22,16 @@ class Person :
         self.a9 = a9
         self.a10 = a10
 
-    def say_hello(self) :
-        print("Hello, my name is", self.name)
 
-    def calculate_age(self):
-        today = date(2025, 5, 28)
+    def get_age(self) -> int:
+        today = date(2025, 5, 28) # Date of the current camp, change if needed
         return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name} ({self.get_age()})"
+
+    def __repr__(self):
+        return f"Person(id={self.id}, name='{self.first_name} {self.last_name}', birthday='{self.birthday}')"
 
 class Gender(Enum):
     MALE = 1
