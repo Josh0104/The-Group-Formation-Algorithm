@@ -44,12 +44,13 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         schema.columns["q10"], # 15
         ]]
 
-    i = 0
+    j = 0
     dictPersons = {}
-    for _, row  in result.iterrows():
-        i += 1
-        if i > 10:
+    for i, row  in result.iterrows():
+        j += 1
+        if j > 10:
             break
+        print(i)
         print("0 "+row.iloc[0])
         print("1 "+row.iloc[1])
         print("2 "+row.iloc[2])
@@ -66,7 +67,11 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         print("13 "+row.iloc[13])
         print("14 "+row.iloc[14] if str(row.iloc[14]) != "nan" else "14")
         print("15 "+ row.iloc[15] if str(row.iloc[15]) != "nan" else "15")
-        dictPersons[row.iloc[1]] = Person.Person(row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5], row.iloc[6], row.iloc[7], row.iloc[8], row.iloc[9], row.iloc[10], row.iloc[11], row.iloc[12], row.iloc[13], row.iloc[14], row.iloc[15])
+
+        uuid = row.iloc[0]
+        first_name = row.iloc[1]
+
+        dictPersons[row.iloc[1]] = Person.Person(row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5], row.iloc[6], row.iloc[7], row.iloc[8], row.iloc[9], row.iloc[10], row.iloc[11], row.iloc[12], row.iloc[13], row.iloc[14], row.iloc[15], row.iloc[16])
 
     return dictPersons
     # p1 = Person.Person(1, "1234","John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
