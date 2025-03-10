@@ -43,15 +43,11 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         schema.columns["q9"], # 14
         schema.columns["q10"], # 15
         ]]
-    #Print each matching name
-    i = 0
-    for _, row  in result.iterrows():
-        i += 1
-        if i > 10:
-            break
-        print("n[0] "+row.iloc[0])
-        print("n[1] "+row.iloc[1])
-        print("n[2] " +row.iloc[2])
 
-    p1 = Person.Person(1, "1234","John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
-    return {"id": p1}
+    dictPersons = {}
+    for _, row  in result.iterrows():
+        dictPersons[row.iloc[1]] = Person.Person(row.iloc[0], row.iloc[1], row.iloc[2], row.iloc[3], row.iloc[4], row.iloc[5], row.iloc[6], row.iloc[7], row.iloc[8], row.iloc[9], row.iloc[10], row.iloc[11], row.iloc[12], row.iloc[13], row.iloc[14], row.iloc[15])
+
+    return dictPersons
+    # p1 = Person.Person(1, "1234","John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
+    # return {"id": p1}
