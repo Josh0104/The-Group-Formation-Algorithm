@@ -11,14 +11,14 @@ def form_teams() -> None:
     max_skill_level = sum(skill_levels) / len(teams)  # Convert to float for safety
 
     # Decision Variables: x[c][t] is 1 if camper c is assigned to team t, else 0
-    x = [[m.add_var(var_type=BINARY) for t in teams] for c in campers]
+    x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in campers]
 
     # Constraint: Each camper is assigned to exactly one team
     for c in campers:
         m += xsum(x[c][t] for t in teams) == 1
 
     # Skill balance constraint using auxiliary variables
-    imbalance = [m.add_var() for t in teams]  # New variables for imbalance
+    imbalance = [m.add_var() for _ in teams]  # New variables for imbalance
 
     for t in teams:
         team_skill = xsum(skill_levels[c] * x[c][t] for c in campers)  # No float conversion
