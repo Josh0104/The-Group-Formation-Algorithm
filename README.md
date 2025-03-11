@@ -7,8 +7,12 @@ The algorithm is to output five teams with the use of the different constraints 
 
 You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-form)
 
-
 ## How to start the project
+
+Create a virtual environment with the python version 3.10
+```bash
+python3.10 -m venv venv
+```
 
 On macOS and Linux
 ```bash 
