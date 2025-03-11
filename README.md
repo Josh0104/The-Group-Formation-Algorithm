@@ -43,6 +43,10 @@ Windows
 venv\Scripts\python.exe main.py
 ```
 
+## Packages used
+
+[See the requirements.txt file](requirements.txt)
+
 ### To deactivate the Virtual Environment
 
 ```bash
