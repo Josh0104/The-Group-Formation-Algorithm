@@ -50,14 +50,14 @@ deactivate
 ```
 
 
-# Additional Notes
+## Additional Notes
 
 To create a virtual environment, run the following command
 ```bash
 python3 -m venv venv
 ```
 
-# For the developers of the project
+## For the developers of the project
 
 ## Branch Naming Convention
 <details>
