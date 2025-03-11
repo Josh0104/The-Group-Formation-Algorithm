@@ -1,13 +1,14 @@
 Package         Version
 --------------- -----------
-cffi            1.15.1
+gurobipy        12.0.1
 mip             1.15.0
-numpy           2.2.3
 pandas          2.2.3
-pip             24.3.1
-pycparser       2.22
-python-dateutil 2.9.0.post0
-pytz            2025.1
-setuptools      75.6.0
-six             1.17.0
-tzdata          2025.1
+
+Python vesion 3.10
+
+Run these commands to install the packages:
+$ pip install gurobipy==12.0.1
+$ pip install mip==1.15.0
+$ pip install pandas==2.2.3
+
+
