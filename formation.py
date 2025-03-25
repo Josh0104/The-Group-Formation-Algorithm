@@ -1,5 +1,8 @@
 from mip import Model, xsum, BINARY, minimize, GUROBI, OptimizationStatus
 from csv_reader import read_csv_pd
+import os
+import time
+import csv
 
 def form_teams():
     # Load data
@@ -47,15 +50,32 @@ def form_teams():
     for t in teams:
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    # Minimize imbalance
+    # Objective: minimize total imbalance
     m.objective = minimize(xsum(imbalance))
     m.optimize()
 
     # Output results
     if m.status == OptimizationStatus.OPTIMAL:
+        # ✅ Save results to a CSV
+        output_dir = "output"
+        os.makedirs(output_dir, exist_ok=True)
+        timestamp = int(time.time())
+        output_path = os.path.join(output_dir, f"{timestamp}.csv")
+
+        # Collect data rows
+        rows = []
         for t in teams:
-            group = [campers[c].first_name + " " + campers[c].last_name
-                     for c in camper_ids if x[c][t].x >= 0.99]
-            print(f"Team {t+1} ({len(group)} members): {group}")
+            for c in camper_ids:
+                if x[c][t].x >= 0.99:
+                    camper = campers[c]
+                    rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
+
+        # Write to CSV
+        with open(output_path, "w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(["ID", "First name", "Last name", "Team"])
+            writer.writerows(rows)
+
+        print(f"✅ Output saved to: {output_path}")
     else:
-        print("No optimal solution found.")
+        print("❌ No optimal solution found.")
