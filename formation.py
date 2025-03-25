@@ -3,6 +3,7 @@ from csv_reader import read_csv_pd
 import os
 import time
 import csv
+import random
 
 def form_teams():
     # Load data
@@ -50,19 +51,22 @@ def form_teams():
     for t in teams:
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    # Objective: minimize total imbalance
-    m.objective = minimize(xsum(imbalance))
+    # Add slight randomness to each team's imbalance penalty
+    epsilon = 0.01
+    random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
+    m.objective = minimize(xsum(random_weights[t] * imbalance[t] for t in teams))
+
+    # Solve
     m.optimize()
 
     # Output results
     if m.status == OptimizationStatus.OPTIMAL:
-        # Save results to a CSV
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
         timestamp = int(time.time())
         output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-        # Collect data rows
+        # Collect data
         rows = []
         for t in teams:
             for c in camper_ids:
@@ -70,7 +74,6 @@ def form_teams():
                     camper = campers[c]
                     rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
 
-        # Write to CSV
         with open(output_path, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["ID", "First name", "Last name", "Team"])
