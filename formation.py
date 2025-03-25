@@ -1,39 +1,61 @@
 from mip import Model, xsum, BINARY, minimize, GUROBI, OptimizationStatus
+from csv_reader import read_csv_pd
 
-def form_teams() -> None:
-    # Create Model with Gurobi as the solver
+def form_teams():
+    # Load data
+    people = read_csv_pd("data/users.csv")
+    campers = list(people.values())
+    num_teams = 5  # Adjust as needed
+
+    # Extract skill level from Q4 (fitness)
+    def interpret_fitness(answer):
+        if "yes" in answer.lower():
+            return 3
+        elif "maybe" in answer.lower():
+            return 2
+        else:
+            return 1
+
+    # Leader from Q1 (willing to be a team leader)
+    def is_team_leader(answer):
+        return 1 if "yes" in answer.lower() else 0
+
+    skill_levels = [interpret_fitness(person.a4) for person in campers]
+    is_leader = [is_team_leader(person.a1) for person in campers]
+
+    num_campers = len(campers)
+    teams = range(num_teams)
+    camper_ids = range(num_campers)
+    avg_skill = sum(skill_levels) / num_teams
+
+    # Model
     m = Model(solver_name=GUROBI)
+    x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
 
-    # Example Data
-    campers = range(10)  # 10 campers
-    teams = range(2)     # 2 teams
-    skill_levels = [3, 2, 4, 5, 1, 3, 2, 4, 5, 1]  # Example skill levels for campers
-    max_skill_level = sum(skill_levels) / len(teams)  # Convert to float for safety
-
-    # Decision Variables: x[c][t] is 1 if camper c is assigned to team t, else 0
-    x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in campers]
-
-    # Constraint: Each camper is assigned to exactly one team
-    for c in campers:
+    # Each camper is in one team
+    for c in camper_ids:
         m += xsum(x[c][t] for t in teams) == 1
 
-    # Skill balance constraint using auxiliary variables
-    imbalance = [m.add_var() for _ in teams]  # New variables for imbalance
-
+    # Balance skill
+    imbalance = [m.add_var() for _ in teams]
     for t in teams:
-        team_skill = xsum(skill_levels[c] * x[c][t] for c in campers)  # No float conversion
-        m += imbalance[t] >= team_skill - max_skill_level  # Corrected constraint
-        m += imbalance[t] >= max_skill_level - team_skill  # Corrected constraint
+        team_skill = xsum(skill_levels[c] * x[c][t] for c in camper_ids)
+        m += imbalance[t] >= team_skill - avg_skill
+        m += imbalance[t] >= avg_skill - team_skill
 
-    # Objective Function: Minimize skill imbalance across teams
+    # ✅ Ensure at least one leader per team
+    for t in teams:
+        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
+
+    # Minimize imbalance
     m.objective = minimize(xsum(imbalance))
-
-    # Solve the optimization problem
     m.optimize()
 
-    # Print Results (only if an optimal solution is found)
-    if m.status == OptimizationStatus.OPTIMAL:  # if optimal solution found
+    # Output results
+    if m.status == OptimizationStatus.OPTIMAL:
         for t in teams:
-            print(f"Team {t+1}: ", [c for c in campers if x[c][t].x is not None and x[c][t].x >= 0.99])
+            group = [campers[c].first_name + " " + campers[c].last_name
+                     for c in camper_ids if x[c][t].x >= 0.99]
+            print(f"Team {t+1} ({len(group)} members): {group}")
     else:
-        print("No optimal solution found!")
+        print("No optimal solution found.")
