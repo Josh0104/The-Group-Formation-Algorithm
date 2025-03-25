@@ -76,6 +76,6 @@ def form_teams():
             writer.writerow(["ID", "First name", "Last name", "Team"])
             writer.writerows(rows)
 
-        print(f"✅ Output saved to: {output_path}")
+        print(f"Output saved to: {output_path}")
     else:
-        print("❌ No optimal solution found.")
+        print("No optimal solution found.")
