@@ -46,7 +46,7 @@ def form_teams():
         m += imbalance[t] >= team_skill - avg_skill
         m += imbalance[t] >= avg_skill - team_skill
 
-    # ✅ Ensure at least one leader per team
+    # Ensure at least one leader per team
     for t in teams:
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
@@ -56,7 +56,7 @@ def form_teams():
 
     # Output results
     if m.status == OptimizationStatus.OPTIMAL:
-        # ✅ Save results to a CSV
+        # Save results to a CSV
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
         timestamp = int(time.time())
