@@ -4,6 +4,9 @@
 # Except for the /data/test* files, these are used for testing
 !/data/test*
 
+# Ignore all csv file in output directory
+/output/*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
