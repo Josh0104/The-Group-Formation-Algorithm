@@ -1,13 +1,11 @@
 from mip import Model, xsum, BINARY, minimize, GUROBI, OptimizationStatus
-from csv_reader import read_csv_pd
 import os
 import time
 import csv
 import random
 
-def form_teams():
+def form_teams(people):
     # Load data
-    people = read_csv_pd("data/users.csv")
     campers = list(people.values())
     num_teams = 5  # Adjust as needed
 
