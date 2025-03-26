@@ -12,9 +12,12 @@ def args_parser():
     args = parser.parse_args()
     file_path = args.input
     
-    if file_path == False:
-        print("Please speicify a file input with -i or --input")
-        exit(1)
+    # If user does not specify a file input
+    if file_path == None:
+        raise TypeError(
+            f'Please specify a file input with -i or --input\n'
+            f'Example usage: python3 main.py -i <path/to/file>'
+            )
     
     if not os.path.exists(file_path):
         raise FileNotFoundError(
@@ -24,7 +27,6 @@ def args_parser():
         ) 
 
     return file_path
-    
     
 
 def main():
@@ -36,8 +38,8 @@ def main():
     except FileNotFoundError as fnfe:
         print(fnfe) # Print the error message
         exit(1)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except TypeError as te:
+        print(te) # Print the error message
         exit(1)
 
 if __name__ == "__main__":
