@@ -11,8 +11,8 @@ def form_teams():
     campers = list(people.values())
     num_teams = 5  # Adjust as needed
 
-    # Extract skill level from Q4 (fitness)
-    def interpret_fitness(answer):
+    # Generic Yes/Maybe/No scoring (for Q2–Q6)
+    def yes_no_maybe_score(answer):
         if "yes" in answer.lower():
             return 3
         elif "maybe" in answer.lower():
@@ -20,41 +20,89 @@ def form_teams():
         else:
             return 1
 
-    # Leader from Q1 (willing to be a team leader)
+    # Team leader → Q1
     def is_team_leader(answer):
         return 1 if "yes" in answer.lower() else 0
 
-    skill_levels = [interpret_fitness(person.a4) for person in campers]
-    is_leader = [is_team_leader(person.a1) for person in campers]
+    # Extract answers
+    skill_levels = [yes_no_maybe_score(person.a4) for person in campers]        # Q4
+    is_leader = [is_team_leader(person.a1) for person in campers]               # Q1
+    creativity = [yes_no_maybe_score(person.a2) for person in campers]          # Q2
+    bible_knowledge = [yes_no_maybe_score(person.a3) for person in campers]     # Q3
+    musical_ability = [yes_no_maybe_score(person.a5) for person in campers]     # Q5
+    camp_experience = [yes_no_maybe_score(person.a6) for person in campers]     # Q6
 
     num_campers = len(campers)
     teams = range(num_teams)
     camper_ids = range(num_campers)
+
+    # Averages
     avg_skill = sum(skill_levels) / num_teams
+    avg_creativity = sum(creativity) / num_teams
+    avg_bible = sum(bible_knowledge) / num_teams
+    avg_music = sum(musical_ability) / num_teams
+    avg_experience = sum(camp_experience) / num_teams
 
     # Model
     m = Model(solver_name=GUROBI)
+    m.max_seconds = 120
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
 
-    # Each camper is in one team
+    # Each camper in one team
     for c in camper_ids:
         m += xsum(x[c][t] for t in teams) == 1
 
-    # Balance skill
+    # Skill imbalance (Q4)
     imbalance = [m.add_var() for _ in teams]
     for t in teams:
         team_skill = xsum(skill_levels[c] * x[c][t] for c in camper_ids)
         m += imbalance[t] >= team_skill - avg_skill
         m += imbalance[t] >= avg_skill - team_skill
 
-    # Ensure at least one leader per team
+    # Creativity imbalance (Q2)
+    creativity_imbalance = [m.add_var() for _ in teams]
+    for t in teams:
+        team_creativity = xsum(creativity[c] * x[c][t] for c in camper_ids)
+        m += creativity_imbalance[t] >= team_creativity - avg_creativity
+        m += creativity_imbalance[t] >= avg_creativity - team_creativity
+
+    # Bible knowledge imbalance (Q3)
+    bible_imbalance = [m.add_var() for _ in teams]
+    for t in teams:
+        team_bible = xsum(bible_knowledge[c] * x[c][t] for c in camper_ids)
+        m += bible_imbalance[t] >= team_bible - avg_bible
+        m += bible_imbalance[t] >= avg_bible - team_bible
+
+    # Musical ability imbalance (Q5)
+    music_imbalance = [m.add_var() for _ in teams]
+    for t in teams:
+        team_music = xsum(musical_ability[c] * x[c][t] for c in camper_ids)
+        m += music_imbalance[t] >= team_music - avg_music
+        m += music_imbalance[t] >= avg_music - team_music
+
+    # Camp experience imbalance (Q6)
+    experience_imbalance = [m.add_var() for _ in teams]
+    for t in teams:
+        team_experience = xsum(camp_experience[c] * x[c][t] for c in camper_ids)
+        m += experience_imbalance[t] >= team_experience - avg_experience
+        m += experience_imbalance[t] >= avg_experience - team_experience
+
+    # Leader requirement (Q1)
     for t in teams:
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    # Add slight randomness to each team's imbalance penalty
+    # Randomized weights for soft variation
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
-    m.objective = minimize(xsum(random_weights[t] * imbalance[t] for t in teams))
+    m.objective = minimize(
+        xsum(random_weights[t] * (
+            imbalance[t] +
+            creativity_imbalance[t] +
+            bible_imbalance[t] +
+            music_imbalance[t] +
+            experience_imbalance[t]
+        ) for t in teams)
+    )
 
     # Solve
     m.optimize()
@@ -66,7 +114,6 @@ def form_teams():
         timestamp = int(time.time())
         output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-        # Collect data
         rows = []
         for t in teams:
             for c in camper_ids:
