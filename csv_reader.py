@@ -11,8 +11,6 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
     
     df = pd.read_csv(file_path)
 
-    # Filter the "First Name" column where the name contains "nd" (case-insensitive)
-    #filtered_names = df[df[schema.columns["q1"]].str.contains("Yes", case=False, na=False)]
     
     result = df[[
         schema.columns["uuid"], # 0
@@ -57,5 +55,3 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
 
     return dictPersons
-    # p1 = Person.Person(1, "1234","John", "Doe", "01/01/2000", "M", "USA", "Yes", "No", "Yes", "No", "Yes", "No", "Yes", "No", "Yes")
-    # return {"id": p1}
