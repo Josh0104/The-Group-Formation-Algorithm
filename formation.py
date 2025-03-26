@@ -116,7 +116,7 @@ def form_teams():
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
     m.objective = minimize(
         xsum(random_weights[t] * (
-            imbalance[t] +
+            1.0 * imbalance[t] +
             1.0 * creativity_imbalance[t] +
             1.0 * bible_imbalance[t] +
             0.5 * music_imbalance[t] +
