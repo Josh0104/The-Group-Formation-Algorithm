@@ -1,13 +1,11 @@
 from mip import Model, xsum, BINARY, minimize, GUROBI, OptimizationStatus
-from csv_reader import read_csv_pd
 import os
 import time
 import csv
 import random
 
-def form_teams():
+def form_teams(people):
     # Load data
-    people = read_csv_pd("data/users.csv")
     campers = list(people.values())
     num_teams = 5  # Adjust as needed
 
@@ -31,8 +29,6 @@ def form_teams():
     bible_knowledge = [yes_no_maybe_score(person.a3) for person in campers]     # Q3
     musical_ability = [yes_no_maybe_score(person.a5) for person in campers]     # Q5
     camp_experience = [yes_no_maybe_score(person.a6) for person in campers]     # Q6
-    performance_experience = [yes_no_maybe_score(person.a7) for person in campers]  # Q7
-    prop_design = [yes_no_maybe_score(person.a8) for person in campers]             # Q8
 
     num_campers = len(campers)
     teams = range(num_teams)
@@ -44,9 +40,6 @@ def form_teams():
     avg_bible = sum(bible_knowledge) / num_teams
     avg_music = sum(musical_ability) / num_teams
     avg_experience = sum(camp_experience) / num_teams
-    avg_performance = sum(performance_experience) / num_teams
-    avg_prop_design = sum(prop_design) / num_teams
-
 
     # Model
     m = Model(solver_name=GUROBI)
@@ -96,33 +89,16 @@ def form_teams():
     for t in teams:
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    # Performance experience imbalance (Q7)
-    performance_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_perf = xsum(performance_experience[c] * x[c][t] for c in camper_ids)
-        m += performance_imbalance[t] >= team_perf - avg_performance
-        m += performance_imbalance[t] >= avg_performance - team_perf
-
-    # Prop/costume design imbalance (Q8)
-    prop_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_prop = xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += prop_imbalance[t] >= team_prop - avg_prop_design
-        m += prop_imbalance[t] >= avg_prop_design - team_prop
-
-
     # Randomized weights for soft variation
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
     m.objective = minimize(
         xsum(random_weights[t] * (
-            1.0 * imbalance[t] +
-            1.0 * creativity_imbalance[t] +
-            1.0 * bible_imbalance[t] +
-            0.5 * music_imbalance[t] +
-            1.0 * experience_imbalance[t] +
-            0.75 * performance_imbalance[t] + 
-            0.75 * prop_imbalance[t]
+            imbalance[t] +
+            creativity_imbalance[t] +
+            bible_imbalance[t] +
+            music_imbalance[t] +
+            experience_imbalance[t]
         ) for t in teams)
     )
 

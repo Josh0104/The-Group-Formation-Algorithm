@@ -6,8 +6,8 @@ import person as Person
 default_file_path = 'data/users.csv'
 
 def read_csv_pd(file_path) -> dict[str, Person.Person]:
-    if file_path == None:
-        file_path = default_file_path
+    # if file_path == None:
+    #     file_path = default_file_path
 
     df = pd.read_csv(file_path)
     # Filter the "First Name" column where the name contains "nd" (case-insensitive)
