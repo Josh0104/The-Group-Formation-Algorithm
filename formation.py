@@ -112,6 +112,15 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
         0.75 * prop_imbalance[t]
     ) for t in teams)
 
+    # Static data
+    # Constraint: prevent certain campers from being in the same team
+    not_together = [(3,6)]
+    for (p, q) in not_together:
+        for t in teams:
+            m += x[p][t] + x[q][t] <= 1
+    
+    
+
     m.optimize()
 
     if m.status == OptimizationStatus.OPTIMAL:
