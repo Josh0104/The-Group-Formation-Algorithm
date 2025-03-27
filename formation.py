@@ -9,34 +9,27 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
     campers = list(people.values())
     num_teams = number_of_groups
 
-    # Generic Yes/Maybe/No scoring (for Q2–Q6)
     def yes_no_maybe_score(answer):
-        if "yes" in answer.lower():
-            return 3
-        elif "maybe" in answer.lower():
-            return 2
-        else:
-            return 1
+        if "yes" in answer.lower(): return 3
+        elif "maybe" in answer.lower(): return 2
+        else: return 1
 
-    # Team leader → Q1
     def is_team_leader(answer):
         return 1 if "yes" in answer.lower() else 0
 
-    # Extract answers
-    skill_levels = [yes_no_maybe_score(person.a4) for person in campers]        # Q4
-    is_leader = [is_team_leader(person.a1) for person in campers]               # Q1
-    creativity = [yes_no_maybe_score(person.a2) for person in campers]          # Q2
-    bible_knowledge = [yes_no_maybe_score(person.a3) for person in campers]     # Q3
-    musical_ability = [yes_no_maybe_score(person.a5) for person in campers]     # Q5
-    camp_experience = [yes_no_maybe_score(person.a6) for person in campers]     # Q6
-    performance_experience = [yes_no_maybe_score(person.a7) for person in campers]  # Q7
-    prop_design = [yes_no_maybe_score(person.a8) for person in campers]             # Q8
+    skill_levels = [yes_no_maybe_score(p.a4) for p in campers]
+    is_leader = [is_team_leader(p.a1) for p in campers]
+    creativity = [yes_no_maybe_score(p.a2) for p in campers]
+    bible_knowledge = [yes_no_maybe_score(p.a3) for p in campers]
+    musical_ability = [yes_no_maybe_score(p.a5) for p in campers]
+    camp_experience = [yes_no_maybe_score(p.a6) for p in campers]
+    performance_experience = [yes_no_maybe_score(p.a7) for p in campers]
+    prop_design = [yes_no_maybe_score(p.a8) for p in campers]
 
     num_campers = len(campers)
     teams = range(num_teams)
     camper_ids = range(num_campers)
 
-    # Averages
     avg_skill = sum(skill_levels) / num_teams
     avg_creativity = sum(creativity) / num_teams
     avg_bible = sum(bible_knowledge) / num_teams
@@ -45,95 +38,101 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
     avg_performance = sum(performance_experience) / num_teams
     avg_prop_design = sum(prop_design) / num_teams
 
-    # Model
     m = Model(solver_name=GUROBI)
     m.max_seconds = 120
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
 
-    # Each camper in one team
     for c in camper_ids:
         m += xsum(x[c][t] for t in teams) == 1
 
-    # Skill imbalance (Q4)
     imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_skill = xsum(skill_levels[c] * x[c][t] for c in camper_ids)
-        m += imbalance[t] >= team_skill - avg_skill
-        m += imbalance[t] >= avg_skill - team_skill
-
-    # Creativity imbalance (Q2)
     creativity_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_creativity = xsum(creativity[c] * x[c][t] for c in camper_ids)
-        m += creativity_imbalance[t] >= team_creativity - avg_creativity
-        m += creativity_imbalance[t] >= avg_creativity - team_creativity
-
-    # Bible knowledge imbalance (Q3)
     bible_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_bible = xsum(bible_knowledge[c] * x[c][t] for c in camper_ids)
-        m += bible_imbalance[t] >= team_bible - avg_bible
-        m += bible_imbalance[t] >= avg_bible - team_bible
-
-    # Musical ability imbalance (Q5)
     music_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_music = xsum(musical_ability[c] * x[c][t] for c in camper_ids)
-        m += music_imbalance[t] >= team_music - avg_music
-        m += music_imbalance[t] >= avg_music - team_music
-
-    # Camp experience imbalance (Q6)
     experience_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_experience = xsum(camp_experience[c] * x[c][t] for c in camper_ids)
-        m += experience_imbalance[t] >= team_experience - avg_experience
-        m += experience_imbalance[t] >= avg_experience - team_experience
+    performance_imbalance = [m.add_var() for _ in teams]
+    prop_imbalance = [m.add_var() for _ in teams]
 
-    # Leader requirement (Q1)
     for t in teams:
+        m += imbalance[t] >= xsum(skill_levels[c] * x[c][t] for c in camper_ids) - avg_skill
+        m += imbalance[t] >= avg_skill - xsum(skill_levels[c] * x[c][t] for c in camper_ids)
+        m += creativity_imbalance[t] >= xsum(creativity[c] * x[c][t] for c in camper_ids) - avg_creativity
+        m += creativity_imbalance[t] >= avg_creativity - xsum(creativity[c] * x[c][t] for c in camper_ids)
+        m += bible_imbalance[t] >= xsum(bible_knowledge[c] * x[c][t] for c in camper_ids) - avg_bible
+        m += bible_imbalance[t] >= avg_bible - xsum(bible_knowledge[c] * x[c][t] for c in camper_ids)
+        m += music_imbalance[t] >= xsum(musical_ability[c] * x[c][t] for c in camper_ids) - avg_music
+        m += music_imbalance[t] >= avg_music - xsum(musical_ability[c] * x[c][t] for c in camper_ids)
+        m += experience_imbalance[t] >= xsum(camp_experience[c] * x[c][t] for c in camper_ids) - avg_experience
+        m += experience_imbalance[t] >= avg_experience - xsum(camp_experience[c] * x[c][t] for c in camper_ids)
+        m += performance_imbalance[t] >= xsum(performance_experience[c] * x[c][t] for c in camper_ids) - avg_performance
+        m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
+        m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
+        m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    # Performance experience imbalance (Q7)
-    performance_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_perf = xsum(performance_experience[c] * x[c][t] for c in camper_ids)
-        m += performance_imbalance[t] >= team_perf - avg_performance
-        m += performance_imbalance[t] >= avg_performance - team_perf
+    name_to_index = {
+        f"{p.first_name.strip().lower()} {p.last_name.strip().lower()}": i
+        for i, p in enumerate(campers)
+    }
 
-    # Prop/costume design imbalance (Q8)
-    prop_imbalance = [m.add_var() for _ in teams]
-    for t in teams:
-        team_prop = xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += prop_imbalance[t] >= team_prop - avg_prop_design
-        m += prop_imbalance[t] >= avg_prop_design - team_prop
+    q9_violations = []
+    q10_violations = []
 
-    # Randomized weights for soft variation
+    for i, person in enumerate(campers):
+        if str(person.a9).strip():
+            target = str(person.a9).strip().lower()
+            j = name_to_index.get(target)
+            if j is not None and i != j:
+                v = m.add_var(var_type=BINARY)
+                for t in teams:
+                    m += x[i][t] - x[j][t] <= v
+                    m += x[j][t] - x[i][t] <= v
+                m.objective += 5 * v
+                q9_violations.append(v)
+
+        if str(person.a10).strip():
+            target = str(person.a10).strip().lower()
+            j = name_to_index.get(target)
+            if j is not None and i != j:
+                v = m.add_var(var_type=BINARY)
+                for t in teams:
+                    m += x[i][t] + x[j][t] <= 1 + v
+                m.objective += 10 * v
+                q10_violations.append(v)
+
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
-    m.objective = minimize(
-        xsum(random_weights[t] * (
-            1.0 * imbalance[t] +
-            1.0 * creativity_imbalance[t] +
-            1.0 * bible_imbalance[t] +
-            0.5 * music_imbalance[t] +
-            1.0 * experience_imbalance[t] +
-            0.75 * performance_imbalance[t] + 
-            0.75 * prop_imbalance[t]
-        ) for t in teams)
-    )
+    m.objective += xsum(random_weights[t] * (
+        1.0 * imbalance[t] +
+        1.0 * creativity_imbalance[t] +
+        1.0 * bible_imbalance[t] +
+        0.5 * music_imbalance[t] +
+        1.0 * experience_imbalance[t] +
+        0.75 * performance_imbalance[t] + 
+        0.75 * prop_imbalance[t]
+    ) for t in teams)
 
-    # Solve
     m.optimize()
 
-    # Output results
     if m.status == OptimizationStatus.OPTIMAL:
+        q9_broken = sum(1 for v in q9_violations if v.x >= 0.99)
+        q10_broken = sum(1 for v in q10_violations if v.x >= 0.99)
+
+        print(f"Q9 (want-to-be-with) violations: {q9_broken}")
+        print(f"Q10 (avoid-this-person) violations: {q10_broken}")
+
+        output_dir = "output"
+        os.makedirs(output_dir, exist_ok=True)
+        timestamp = int(time.time())
+        output_path = os.path.join(output_dir, f"{timestamp}.csv")
+
         rows = []
         for t in teams:
             for c in camper_ids:
                 if x[c][t].x >= 0.99:
                     camper = campers[c]
                     rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
--
+
         if args_output_file:
             output_dir = "output"
             os.makedirs(output_dir, exist_ok=True)
