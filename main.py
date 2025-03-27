@@ -10,7 +10,7 @@ def args_parser():
     parser.add_argument("-i","--input", help="File input to read", type=str)
     parser.add_argument("-g", "--group", help="Number of groups", type=int)
     parser.add_argument("-p", "--print", help="Print the output", action="store_true")
-    parser.add_argument("-o", "--output", help="Output file", type=str)
+    parser.add_argument("-o", "--output", help="Output file, if set to 'none', it will not create an output file", type=str)
     
     
      
