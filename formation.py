@@ -114,10 +114,15 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
 
     # Static data
     # Constraint: prevent certain campers from being in the same team
-    not_together = [(3,6)]
+    not_together = [(7,8), (7,2)]
     for (p, q) in not_together:
         for t in teams:
             m += x[p][t] + x[q][t] <= 1
+
+    be_together = [(0,1), (1,9)]
+    for (p, q) in be_together:
+        for t in teams:
+            m += x[p][t] - x[q][t] == 0
     
     
 
