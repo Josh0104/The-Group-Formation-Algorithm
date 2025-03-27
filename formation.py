@@ -4,10 +4,10 @@ import time
 import csv
 import random
 
-def form_teams(people):
+def form_teams(people, number_of_groups, is_printing_output, args_output_file):
     # Load data
     campers = list(people.values())
-    num_teams = 5  # Adjust as needed
+    num_teams = number_of_groups
 
     # Generic Yes/Maybe/No scoring (for Q2–Q6)
     def yes_no_maybe_score(answer):
@@ -127,23 +127,34 @@ def form_teams(people):
 
     # Output results
     if m.status == OptimizationStatus.OPTIMAL:
-        output_dir = "output"
-        os.makedirs(output_dir, exist_ok=True)
-        timestamp = int(time.time())
-        output_path = os.path.join(output_dir, f"{timestamp}.csv")
-
         rows = []
         for t in teams:
             for c in camper_ids:
                 if x[c][t].x >= 0.99:
                     camper = campers[c]
                     rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
+-
+        if args_output_file:
+            output_dir = "output"
+            os.makedirs(output_dir, exist_ok=True)
+            timestamp = int(time.time())
+            output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-        with open(output_path, "w", newline="") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(["ID", "First name", "Last name", "Team"])
-            writer.writerows(rows)
 
-        print(f"Output saved to: {output_path}")
+            with open(output_path, "w", newline="") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(["ID", "First name", "Last name", "Team"])
+                writer.writerows(rows)
+
+            print(f"Output saved to: {output_path}")
+    
+        if is_printing_output:
+            for row in rows:
+                print(row)
+            # Print number of people in each team
+            for t in teams:
+                print(f"Team {t + 1}: {len([row for row in rows if row[3] == t + 1])}")
+            
+            
     else:
         print("No optimal solution found.")
