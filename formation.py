@@ -68,7 +68,7 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
+        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 0
 
     name_to_index = {
         f"{p.first_name.strip().lower()} {p.last_name.strip().lower()}": i
