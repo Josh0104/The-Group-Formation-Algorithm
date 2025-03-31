@@ -30,9 +30,20 @@ To run the Python script with a file as input, use the following command:
 python3 main.py --input <path/to/file>
 ```
 
+### Command-line Arguments
+
+| Argument         | Alternative       | Value Format         | Description                          | Required | Default Value  |
+|------------------|-------------------|-----------------------|--------------------------------------|----------|----------------|
+| `-i`             | `--input`         | `path/to/input.csv`   | File input to read                   | Yes      | -              |
+| `-g`             | `--group`         | `int`                 | Number of groups to form             | No      | 5              |
+| `-p`             | `--print`         | `flag`                | Print the output to console          | No       | `False`        |
+| `-o`             | `--output`        | `path/to/output.csv`  | Path for output file                 | No       | `./output`     |
+| `-n`             | `--no-output`     | `flag`                | Do not generate an output file       | No       | `False`        |
 
 
-### Alternative method 
+
+<details>
+<summary> Alternative method  </summary>
 
 Direct Execution Without Activation
 
@@ -45,6 +56,7 @@ Windows
 ```bash
 venv\Scripts\python.exe main.py
 ```
+</details>
 
 ### To deactivate the Virtual Environment
 
