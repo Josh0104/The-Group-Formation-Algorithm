@@ -4,7 +4,7 @@ import time
 import csv
 import random
 
-def form_teams(people, number_of_groups, is_printing_output, args_output_file):
+def form_teams(people, number_of_groups, is_printing_output, args_output_file, args_no_output):
     # Load data
     campers = list(people.values())
     num_teams = number_of_groups
@@ -147,8 +147,8 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file):
                     camper = campers[c]
                     rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
 
-        if args_output_file:
-            output_dir = "output"
+        if args_no_output is not True:
+            output_dir = args_output_file if args_output_file != None else "output"
             os.makedirs(output_dir, exist_ok=True)
             timestamp = int(time.time())
             output_path = os.path.join(output_dir, f"{timestamp}.csv")

@@ -9,6 +9,7 @@ You can read more about the project and how we handle the data: [link](https://c
 
 ## How to start the project
 
+
 Create a virtual environment with the python version 3.10
 ```bash
 python3.10 -m venv venv
@@ -29,6 +30,8 @@ To run the Python script with a file as input, use the following command:
 python3 main.py --input <path/to/file>
 ```
 
+
+
 ### Alternative method 
 
 Direct Execution Without Activation
@@ -43,19 +46,18 @@ Windows
 venv\Scripts\python.exe main.py
 ```
 
-
-## Required Packages  
-
-The dependencies for this project are listed in the [`requirements.txt`](requirements.txt) file.  
-
-### Gurobi License  
-To obtain results, a **Gurobi license** is required. You can find instructions on how to get a license on their [official website](https://www.gurobi.com/).
-
 ### To deactivate the Virtual Environment
 
 ```bash
 deactivate
 ```
+
+### Required Packages  
+
+The dependencies for this project are listed in the [`requirements.txt`](requirements.txt) file.  
+
+### Gurobi License  
+To obtain results, a **Gurobi license** is required. You can find instructions on how to get a license on their [official website](https://www.gurobi.com/).
 
 
 ## Additional Notes
