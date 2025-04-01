@@ -4,7 +4,7 @@ import time
 import csv
 import random
 import relations as Relations
-import person as Person
+from person import Person
 
 def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output):
     # Load data
@@ -116,7 +116,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     
     relations = Relations.get_relations(people)
     
-    
     relations_together: list[tuple] = []
     relations_separate: list[tuple] = []
     for r in relations.values():
@@ -205,7 +204,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             # Print number of people in each team
             for t in teams:
                 print(f"Team {t + 1}: {len([row for row in rows if row[3] == t + 1])}")
-            
             
     else:
         print("No optimal solution found.")
