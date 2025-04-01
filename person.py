@@ -41,3 +41,17 @@ class SurveyResponse(Enum):
     YES = 1
     NO = 2
     MAYBE = 3
+
+class Relation:
+    def __init__(self, id, id_1, name_1, name_2, id_2, relation, weight, description):
+        self.id = id
+        self.id_1 = id_1
+        self.name_1 = name_1
+        self.name_2 = name_2
+        self.id_2 = id_2
+        self.relation = relation
+        self.weight = weight
+        self.description = description
+
+    def __str__(self) -> str:
+        return f"{self.name_1} - {self.name_2} ({self.relation})"

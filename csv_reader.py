@@ -4,6 +4,7 @@ import csv_schema as schema
 import person as Person
 
 default_file_path = 'data/users.csv'
+dictPersons = {}
 
 def read_csv_pd(file_path) -> dict[str, Person.Person]:
     # if file_path == None:
@@ -31,7 +32,7 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         schema.columns["q10"], # 15
         ]]
 
-    dictPersons = {}
+
     for i, row  in result.iterrows():
 
         uuid = row.iloc[0]
@@ -50,8 +51,42 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         a8 = row.iloc[13]
         a9 = row.iloc[14] if str(row.iloc[14]) != "nan" else ""
         a10 = row.iloc[15] if str(row.iloc[15]) != "nan" else ""
+        
+        print(f"i: {i} - {first_name} {last_name}")
+        print(f"row.iloc[0]: {row.iloc[0]}")
 
         dictPersons[row.iloc[0]] = Person.Person(
         i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
 
     return dictPersons
+
+def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
+    if file_path == None:
+        file_path = "data/relations1.csv"
+    
+    df = pd.read_csv(file_path)
+
+    result = df[[
+        schema.columns_relations["id_1"], # 0
+        schema.columns_relations["name_1"], # 1
+        schema.columns_relations["name_2"], # 2
+        schema.columns_relations["id_2"], # 3
+        schema.columns_relations["relation"], # 4
+        schema.columns_relations["weight"], # 5
+        schema.columns_relations["description"] # 6
+        ]]
+
+    dictRelations = {}
+    for i, row  in result.iterrows():
+        id_1 = row.iloc[0]
+        name_1 = row.iloc[1]
+        name_2 = row.iloc[2]
+        id_2 = row.iloc[3]
+        relation = row.iloc[4]
+        weight = row.iloc[5]
+        description = row.iloc[6]
+
+        dictRelations[row.iloc[0]] = Person.Relation(
+            i, id_1, name_1, name_2, id_2, relation, weight, description)
+
+    return dictRelations
