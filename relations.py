@@ -11,18 +11,18 @@ def get_relations() -> dict:
     with open(file_path, mode='r', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            id_1 = row['id_1']
+            uuid_1 = row['uuid_1']
             name_1 = row['name_1']
             name_2 = row['name_2']
-            id_2 = row['id_2']
+            uuid_2 = row['uuid_2']
             relation = row['relation']
             weight = row['weight']
             description = row['description']
             
-            relations[id_1] = {
+            relations[uuid_1] = {
                 'name_1': name_1,
                 'name_2': name_2,
-                'id_2': id_2,
+                'uuid_2': uuid_2,
                 'relation': relation,
                 'weight': weight,
                 'description': description

@@ -43,12 +43,12 @@ class SurveyResponse(Enum):
     MAYBE = 3
 
 class Relation:
-    def __init__(self, id, id_1, name_1, name_2, id_2, relation, weight, description):
+    def __init__(self, id, uuid_1, name_1, name_2, uuid_2, relation, weight, description):
         self.id = id
-        self.id_1 = id_1
+        self.uuid_1 = uuid_1
         self.name_1 = name_1
         self.name_2 = name_2
-        self.id_2 = id_2
+        self.uuid_2 = uuid_2
         self.relation = relation
         self.weight = weight
         self.description = description

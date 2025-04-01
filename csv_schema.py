@@ -18,10 +18,10 @@ columns = {
 }
 
 columns_relations = {
-    "id_1": "id_1",
+    "uuid_1": "uuid_1",
     "name_1": "name_1",
     "name_2": "name_2",
-    "id_2": "id_2",
+    "uuid_2": "uuid_2",
     "relation": "relation",
     "weight": "weight",
     "description": "description",

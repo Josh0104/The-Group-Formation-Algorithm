@@ -67,10 +67,10 @@ def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
     df = pd.read_csv(file_path)
 
     result = df[[
-        schema.columns_relations["id_1"], # 0
+        schema.columns_relations["uuid_1"], # 0
         schema.columns_relations["name_1"], # 1
         schema.columns_relations["name_2"], # 2
-        schema.columns_relations["id_2"], # 3
+        schema.columns_relations["uuid_2"], # 3
         schema.columns_relations["relation"], # 4
         schema.columns_relations["weight"], # 5
         schema.columns_relations["description"] # 6
@@ -78,15 +78,15 @@ def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
 
     dictRelations = {}
     for i, row  in result.iterrows():
-        id_1 = row.iloc[0]
+        uuid_1 = row.iloc[0]
         name_1 = row.iloc[1]
         name_2 = row.iloc[2]
-        id_2 = row.iloc[3]
+        uuid_2 = row.iloc[3]
         relation = row.iloc[4]
         weight = row.iloc[5]
         description = row.iloc[6]
 
         dictRelations[row.iloc[0]] = Person.Relation(
-            i, id_1, name_1, name_2, id_2, relation, weight, description)
+            i, uuid_1, name_1, name_2, uuid_2, relation, weight, description)
 
     return dictRelations
