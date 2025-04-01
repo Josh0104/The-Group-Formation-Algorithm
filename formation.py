@@ -68,7 +68,7 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 0
+        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
     name_to_index = {
         f"{p.first_name.strip().lower()} {p.last_name.strip().lower()}": i
@@ -112,17 +112,17 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
         0.75 * prop_imbalance[t]
     ) for t in teams)
 
-    # Static data
-    # Constraint: prevent certain campers from being in the same team
-    not_together = [(7,8), (7,2)]
-    for (p, q) in not_together:
-        for t in teams:
-            m += x[p][t] + x[q][t] <= 1
+    # # Static data
+    # # Constraint: prevent certain campers from being in the same team
+    # not_together = [(7,8), (7,2)]
+    # for (p, q) in not_together:
+    #     for t in teams:
+    #         m += x[p][t] + x[q][t] <= 1
 
-    be_together = [(0,1), (1,9)]
-    for (p, q) in be_together:
-        for t in teams:
-            m += x[p][t] - x[q][t] == 0
+    # be_together = [(0,1), (1,9)]
+    # for (p, q) in be_together:
+    #     for t in teams:
+    #         m += x[p][t] - x[q][t] == 0
     
 
     m.optimize()
