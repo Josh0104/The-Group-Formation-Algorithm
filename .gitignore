@@ -1,8 +1,12 @@
-# Ignore all files in /data directory, this is where user data will be stored
-/data/*
+# Ignore everything in data/ and subfolders
+/data/**
 
-# Except for the /data/test* files, these are used for testing
-!/data/test*
+# But keep folders so git can access files inside them
+!data/
+!data/**/
+ 
+# Then un-ignore test*.csv files inside data/ and any subfolder
+!data/**/test*.csv
 
 # Ignore all csv file in output directory
 /output/*.csv
