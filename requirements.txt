@@ -3,6 +3,7 @@ Package         Version
 gurobipy        12.0.1
 mip             1.15.0
 pandas          2.2.3
+nicegui         2.13.0
 
 Python vesion 3.10
 
@@ -10,5 +11,6 @@ Run these commands to install the packages:
 $ pip install gurobipy==12.0.1
 $ pip install mip==1.15.0
 $ pip install pandas==2.2.3
+$ pip install nicegui==2.13.0
 
 
