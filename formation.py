@@ -124,7 +124,6 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
         for t in teams:
             m += x[p][t] - x[q][t] == 0
     
-    
 
     m.optimize()
 
