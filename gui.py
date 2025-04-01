@@ -8,8 +8,8 @@ DATA_PATH = 'data/users.csv'
 
 # Global variables
 person_dict = cr.read_csv_pd(DATA_PATH)
-teams_data = []  # List of tuples: (team_number, [Person, ...])
-team_stats = {}  # Dict[int, dict] of team number to stats
+teams_data = []
+team_stats = {}
 
 # Constraint tracking
 same_team_constraints = []
@@ -17,25 +17,24 @@ diff_team_constraints = []
 
 # UI elements
 team_cards = []
-team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")  # holds teams output
+team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
+chart_container = ui.row().classes("w-full justify-center mt-8")
+loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
+with loading_container:
+    loading = ui.spinner(size='lg', color='primary').props('thickness=6')
+    loading_text = ui.label("Optimizing teams... Please wait").classes("text-md")
 
-# Fullscreen loading overlay
-loading_overlay = ui.row().classes("fixed inset-0 bg-white bg-opacity-70 z-50 items-center justify-center hidden")
-with loading_overlay:
-    with ui.column().classes("items-center"):
-        loading_spinner = ui.spinner(size='lg', color='primary').props('thickness=6')
-        ui.label("Optimizing teams... Please wait").classes("text-md mt-2")
-
-# Helper to recompute team stats
+# Compute stats
 def compute_stats(team_members):
     total = len(team_members)
     leaders = sum(1 for p in team_members if "yes" in p.a1.lower())
-    return {'total': total, 'leaders': leaders}
+    skill_total = sum(3 if "yes" in p.a4.lower() else 1 if "maybe" in p.a4.lower() else 0 for p in team_members)
+    return {'total': total, 'leaders': leaders, 'skill': skill_total}
 
-# Run optimizer and update UI
+# Run optimizer
 async def run_optimizer():
     global teams_data, team_stats
-    loading_overlay.classes(remove='hidden')
+    loading_container.classes(remove='hidden')
 
     try:
         await run.io_bound(lambda: fm.form_teams(
@@ -53,7 +52,7 @@ async def run_optimizer():
 
         latest_file = sorted(output_files, key=lambda f: os.path.getmtime(f"output/{f}"))[-1]
         with open(f"output/{latest_file}", "r") as f:
-            lines = f.readlines()[1:]  # skip header
+            lines = f.readlines()[1:]
             raw_teams = {}
             for line in lines:
                 uuid, first, last, team = line.strip().split(",")
@@ -67,13 +66,15 @@ async def run_optimizer():
         update_team_ui()
 
     finally:
-        loading_overlay.classes(add='hidden')
+        loading_container.classes(add='hidden')
 
-# Update the output UI
+# Update team + chart UI
 def update_team_ui():
     team_container.clear()
     team_cards.clear()
+    chart_container.clear()
 
+    # Display teams
     for team, members in teams_data:
         with team_container:
             with ui.expansion(f'Team {team}', icon='group').classes('w-full') as exp:
@@ -84,7 +85,24 @@ def update_team_ui():
                         ui.label(f"• {member.first_name} {member.last_name}")
                 team_cards.append(exp)
 
-# Constraint adding (UI only for now)
+    # Skill score chart
+    labels = [f'Team {team}' for team, _ in teams_data]
+    skills = [team_stats[team]['skill'] for team, _ in teams_data]
+
+    with chart_container:
+        ui.echart({
+            'title': {'text': 'Total Skill Score per Team'},
+            'tooltip': {},
+            'xAxis': {'type': 'category', 'data': labels},
+            'yAxis': {'type': 'value'},
+            'series': [{
+                'type': 'bar',
+                'data': skills,
+                'itemStyle': {'color': '#4F46E5'}
+            }]
+        }).classes("w-full max-w-4xl")
+
+# Constraints
 def add_constraint(together=True):
     person_a = same_a.value if together else diff_a.value
     person_b = same_b.value if together else diff_b.value
@@ -100,7 +118,7 @@ def add_constraint(together=True):
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
-# --- GUI layout ---
+# --- Layout ---
 with ui.column().classes("items-center w-full"):
     ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
     ui.separator()
@@ -120,5 +138,10 @@ with ui.column().classes("items-center w-full"):
 
     ui.button("RE-RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("mt-6 bg-primary text-white")
 
-# --- App start ---
+# Attach containers
+team_container
+chart_container
+loading_container
+
+# --- Run app ---
 ui.run()
