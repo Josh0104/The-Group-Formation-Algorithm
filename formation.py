@@ -155,9 +155,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     # Constraint: prevent certain campers from being in the same team
     
     # not_together = [(7,8), (7,2)]
-    print(f"Relations: {relations_separate}")
     for (p, q) in relations_separate:
-        print(f"Relation: {p}, {q}")
         for t in teams:
             m += x[p][t] + x[q][t] <= 1
 
