@@ -1,16 +1,19 @@
 import os
+from person import Person
 import csv
 
-def get_relations() -> dict:
+
+def get_relations(people: dict[str, Person]) -> dict:
     """
     Reads the relations CSV file and returns a dictionary of relations.
     """
-    file_path = os.path.join(os.path.dirname(__file__), 'data', 'relations.csv')
+    file_path = os.path.join(os.path.dirname(__file__), 'data/relations', 'relations2.csv')
     relations = {}
     
-    with open(file_path, mode='r', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
+    with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        print("CSV header:", reader.fieldnames)
+        for i, row in enumerate(reader, start=0):  # start=0 to match line numbers
             uuid_1 = row['uuid_1']
             name_1 = row['name_1']
             name_2 = row['name_2']
@@ -19,13 +22,19 @@ def get_relations() -> dict:
             weight = row['weight']
             description = row['description']
             
-            relations[uuid_1] = {
+            id_1 = people[uuid_1].id
+            id_2 = people[uuid_2].id
+            
+            relations[i] = {
+                'uuid_1': uuid_1,
                 'name_1': name_1,
                 'name_2': name_2,
                 'uuid_2': uuid_2,
                 'relation': relation,
                 'weight': weight,
-                'description': description
+                'description': description,
+                'id_1': id_1,
+                'id_2': id_2
             }
     
     return relations

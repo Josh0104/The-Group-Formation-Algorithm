@@ -3,8 +3,10 @@ import os
 import time
 import csv
 import random
+import relations as Relations
+import person as Person
 
-def form_teams(people, number_of_groups, is_printing_output, args_output_file, args_no_output):
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output):
     # Load data
     campers = list(people.values())
     num_teams = number_of_groups
@@ -111,16 +113,55 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
         0.75 * performance_imbalance[t] + 
         0.75 * prop_imbalance[t]
     ) for t in teams)
+    
+    relations = Relations.get_relations(people)
+    
+    
+    relations_together: list[tuple] = []
+    relations_separate: list[tuple] = []
+    for r in relations.values():
+        id_1 = r['id_1']
+        id_2 = r['id_2']
+        relation = r['relation']
+        print(f"Relation: {r['relation']}, {id_1}, {id_2} {r['name_1']}, {r['name_2']}, {r['relation']}")
+        
+        if relation == 'TOGETHER':
+            relations_together.append((id_1, id_2))
+        elif relation == 'SEPARATE':
+            relations_separate.append((id_1, id_2))
+            
+        # uuid_1 = r['uuid_1']
+        # uuid_2 = r['uuid_2']
+        # relation = r['relation']
+        # weight = r['weight']
+        # description = r['description']
+
+        # if relation == "TOGETHER":
+        #     v = m.add_var(var_type=BINARY)
+        #     for t in teams:
+        #         m += x[name_to_index[uuid_1]][t] - x[name_to_index[uuid_2]][t] <= v
+        #         m += x[name_to_index[uuid_2]][t] - x[name_to_index[uuid_1]][t] <= v
+        #     m.objective += 5 * v
+        #     q9_violations.append(v)
+
+        # elif relation == "SEPARATE":
+        #     v = m.add_var(var_type=BINARY)
+        #     for t in teams:
+        #         m += x[name_to_index[uuid_1]][t] + x[name_to_index[uuid_2]][t] <= 1 + v
+        #     m.objective += 10 * v
+        #     q10_violations.append(v)
 
     # Static data
     # Constraint: prevent certain campers from being in the same team
-    not_together = [(7,8), (7,2)]
-    for (p, q) in not_together:
+    
+    # not_together = [(7,8), (7,2)]
+    print(f"Relations: {relations_separate}")
+    for (p, q) in relations_separate:
+        print(f"Relation: {p}, {q}")
         for t in teams:
             m += x[p][t] + x[q][t] <= 1
 
-    be_together = [(0,1), (1,9)]
-    for (p, q) in be_together:
+    for (p, q) in relations_together:
         for t in teams:
             m += x[p][t] - x[q][t] == 0
     

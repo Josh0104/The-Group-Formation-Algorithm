@@ -51,9 +51,6 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         a8 = row.iloc[13]
         a9 = row.iloc[14] if str(row.iloc[14]) != "nan" else ""
         a10 = row.iloc[15] if str(row.iloc[15]) != "nan" else ""
-        
-        print(f"i: {i} - {first_name} {last_name}")
-        print(f"row.iloc[0]: {row.iloc[0]}")
 
         dictPersons[row.iloc[0]] = Person.Person(
         i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
