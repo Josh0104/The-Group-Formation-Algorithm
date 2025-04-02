@@ -2,6 +2,7 @@ import os
 import csv_reader as cr
 import formation as fm
 import argparse
+import gui
 
 # Reading arguments
 def args_parser():
@@ -54,5 +55,6 @@ def main():
         print(te) # Print the error message
         exit(1)
 
-if __name__ == "__main__":
-    main()
+if __name__ in {"__main__", "__mp_main__"}:
+    # main()
+    gui.run_view()

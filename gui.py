@@ -15,14 +15,17 @@ team_stats = {}
 same_team_constraints = []
 diff_team_constraints = []
 
-# UI elements
+same_a = None
+diff_a = None
+same_b = None
+diff_b = None
 team_cards = []
+loading_container = None
+loading = None
+# UI elements
 team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
 chart_container = ui.row().classes("w-full justify-center mt-8")
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
-with loading_container:
-    loading = ui.spinner(size='lg', color='primary').props('thickness=6')
-    loading_text = ui.label("Optimizing teams... Please wait").classes("text-md")
 
 # Compute stats
 def compute_stats(team_members):
@@ -128,33 +131,38 @@ def add_constraint(together=True):
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
-# --- Layout ---
-with ui.column().classes("items-center w-full"):
-    ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
-    ui.separator()
+def run_view() -> None:
 
-    with ui.row().classes("mt-6 justify-center gap-10"):
-        with ui.column().classes("items-center"):
-            ui.label("Force people on same team").classes("font-semibold")
-            same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-            same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
-            ui.button("Add", on_click=lambda: add_constraint(together=True))
+    with loading_container:
+        loading = ui.spinner(size='lg', color='primary').props('thickness=6')
+        loading_text = ui.label("Optimizing teams... Please wait").classes("text-md")
 
-        with ui.column().classes("items-center"):
-            ui.label("Force people on different teams").classes("font-semibold")
-            diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-            diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
-            ui.button("Add", on_click=lambda: add_constraint(together=False))
+    # --- Layout ---
+    with ui.column().classes("items-center w-full"):
+        ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
+        ui.separator()
 
-    ui.row().classes("mt-4 gap-4")
-    ui.button("RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("bg-primary text-white")
-    ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
+        with ui.row().classes("mt-6 justify-center gap-10"):
+            with ui.column().classes("items-center"):
+                ui.label("Force people on same team").classes("font-semibold")
+                same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
+                same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                ui.button("Add", on_click=lambda: add_constraint(together=True))
 
-# Attach containers
-team_container
-chart_container
-loading_container
+            with ui.column().classes("items-center"):
+                ui.label("Force people on different teams").classes("font-semibold")
+                diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
+                diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                ui.button("Add", on_click=lambda: add_constraint(together=False))
 
-# --- Run app ---
-ui.run(native=True)
+        ui.row().classes("mt-4 gap-4")
+        ui.button("RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("bg-primary text-white")
+        ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
 
+    # Attach containers
+    team_container
+    chart_container
+    loading_container
+
+    # --- Run app ---
+    ui.run(native=True)
