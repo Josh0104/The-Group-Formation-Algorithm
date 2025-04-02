@@ -6,7 +6,12 @@ import random
 import relations as Relations
 from person import Person
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output):
+# Global variable to store last model for saving
+last_model = None
+
+def form_teams(people, number_of_groups, is_printing_output, args_output_file, args_no_output):
+    global last_model
+
     # Load data
     campers = list(people.values())
     num_teams = number_of_groups
@@ -70,7 +75,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 0
+        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
     name_to_index = {
         f"{p.first_name.strip().lower()} {p.last_name.strip().lower()}": i
@@ -165,6 +170,9 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
 
     m.optimize()
 
+    # Save the model so GUI can access it
+    last_model = m
+
     if m.status == OptimizationStatus.OPTIMAL:
         q9_broken = sum(1 for v in q9_violations if v.x >= 0.99)
         q10_broken = sum(1 for v in q10_violations if v.x >= 0.99)
@@ -190,18 +198,16 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             timestamp = int(time.time())
             output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-
             with open(output_path, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["ID", "First name", "Last name", "Team"])
                 writer.writerows(rows)
 
             print(f"Output saved to: {output_path}")
-    
+
         if is_printing_output:
             for row in rows:
                 print(row)
-            # Print number of people in each team
             for t in teams:
                 print(f"Team {t + 1}: {len([row for row in rows if row[3] == t + 1])}")
             
