@@ -48,6 +48,8 @@ def main():
         path, number_of_groups, is_printing_output, args_output_file, args_no_output = args_parser()
         dict_uuid_person = cr.read_csv_pd(path)
         fm.form_teams(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output) 
+        gui.run_view()
+
     except FileNotFoundError as fnfe:
         print(fnfe) # Print the error message
         exit(1)
@@ -56,5 +58,4 @@ def main():
         exit(1)
 
 if __name__ in {"__main__", "__mp_main__"}:
-    # main()
-    gui.run_view()
+    main()
