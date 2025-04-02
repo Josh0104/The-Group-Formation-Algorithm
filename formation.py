@@ -9,7 +9,7 @@ from person import Person
 # Global variable to store last model for saving
 last_model = None
 
-def form_teams(people, number_of_groups, is_printing_output, args_output_file, args_no_output):
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output):
     global last_model
 
     # Load data
