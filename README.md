@@ -35,11 +35,11 @@ python3 main.py --input <path/to/file>
 | Argument         | Alternative       | Value Format         | Description                          | Required | Default Value  |
 |------------------|-------------------|-----------------------|--------------------------------------|----------|----------------|
 | `-i`             | `--input`         | `path/to/input.csv`   | File input to read                   | Yes      | -              |
-| `-g`             | `--group`         | `int`                 | Number of groups to form             | No      | 5              |
+| `-g`             | `--group`         | `int`                 | Number of groups to form             | No       | 5              |
 | `-p`             | `--print`         | `flag`                | Print the output to console          | No       | `False`        |
 | `-o`             | `--output`        | `path/to/output.csv`  | Path for output file                 | No       | `./output`     |
 | `-n`             | `--no-output`     | `flag`                | Do not generate an output file       | No       | `False`        |
-
+| `-v`             | `--verbose`       | `flag`                | Generate gurobi solution to console  | No       | `False`        |
 
 
 <details>

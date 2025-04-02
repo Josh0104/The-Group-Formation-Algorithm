@@ -1,4 +1,5 @@
 from mip import Model, xsum, BINARY, minimize, GUROBI, OptimizationStatus
+import gurobipy as gp
 import os
 import time
 import csv
@@ -9,7 +10,7 @@ from person import Person
 # Global variable to store last model for saving
 last_model = None
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output):
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose):
     global last_model
 
     # Load data
@@ -46,7 +47,8 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     avg_prop_design = sum(prop_design) / num_teams
 
     m = Model(solver_name=GUROBI)
-    m.max_seconds = 120
+    m.verbose = 0 if args_verbose is False else 1 # Print solver output
+    m.max_seconds = 120 # Set a time limit of 120 seconds
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
 
     for c in camper_ids:
