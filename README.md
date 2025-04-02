@@ -32,15 +32,15 @@ python3 main.py --input <path/to/file>
 
 ### Command-line Arguments
 
-| Argument         | Alternative       | Value Format         | Description                          | Required | Default Value  |
-|------------------|-------------------|-----------------------|--------------------------------------|----------|----------------|
-| `-i`             | `--input`         | `path/to/input.csv`   | File input to read                   | Yes      | -              |
-| `-g`             | `--group`         | `int`                 | Number of groups to form             | No       | 5              |
-| `-p`             | `--print`         | `flag`                | Print the output to console          | No       | `False`        |
-| `-o`             | `--output`        | `path/to/output.csv`  | Path for output file                 | No       | `./output`     |
-| `-n`             | `--no-output`     | `flag`                | Do not generate an output file       | No       | `False`        |
-| `-v`             | `--verbose`       | `flag`                | Generate gurobi solution to console  | No       | `False`        |
-| `--no-gui`       |   -               | `flag`                | Prvent the program to create <br> a graphical user interface  | No       | `True`        |
+| Argument         | Alternative       | Value Format          | Required | Default Value  | Description                                                  |
+|------------------|-------------------|-----------------------|--------------------------------------|----------|----------------------------------------|
+| `-i`             | `--input`         | `path/to/input.csv`   |  -       | Yes            | File input to read                                           |
+| `-g`             | `--group`         | `int`                 | No       | 5              | Number of groups to form                                     |
+| `-p`             | `--print`         | `flag`                | No       | `False`        | Print the output to console                                  |
+| `-o`             | `--output`        | `path/to/output.csv`  | No       | `./output`     | Path for output file                                         |
+| `-n`             | `--no-output`     | `flag`                | No       | `False`        | Do not generate an output file                               |
+| `-v`             | `--verbose`       | `flag`                | No       | `False`        | Generate gurobi solution to console                          |
+| `--no-gui`       |   -               | `flag`                | No       | `True`         | Prvent the program to create <br> a graphical user interface |
 
 
 
