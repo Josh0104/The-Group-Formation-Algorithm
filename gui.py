@@ -156,5 +156,5 @@ chart_container
 loading_container
 
 # --- Run app ---
-ui.run()
+ui.run(native=True)
 
