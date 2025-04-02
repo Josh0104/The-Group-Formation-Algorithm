@@ -34,13 +34,13 @@ python3 main.py --input <path/to/file>
 
 | Argument         | Alternative       | Value Format          | Required | Default Value  | Description                                                  |
 |------------------|-------------------|-----------------------|--------------------------------------|----------|----------------------------------------|
-| `-i`             | `--input`         | `path/to/input.csv`   | Yes     | -               | File input to read                                           |
-| `-g`             | `--group`         | `int`                 | No       | 5              | Number of groups to form                                     |
+| `-i`             | `--input`         | `path/to/input.csv`   | Yes      | -              | File input to read                                           |
+| `-g`             | `--group`         | `int`                 | No       | `5`              | Number of groups to form                                   |
 | `-p`             | `--print`         | `flag`                | No       | `False`        | Print the output to console                                  |
 | `-o`             | `--output`        | `path/to/output.csv`  | No       | `./output`     | Path for output file                                         |
 | `-n`             | `--no-output`     | `flag`                | No       | `False`        | Do not generate an output file                               |
 | `-v`             | `--verbose`       | `flag`                | No       | `False`        | Generate gurobi solution to console                          |
-| `--no-gui`       |   -               | `flag`                | No       | `True`         | Prvent the program to create a graphical user interface      |
+| `--no-gui`       |   -               | `flag`                | No       | `Flase`        | Prevent the program to create a graphical user interface     |
 
 
 
