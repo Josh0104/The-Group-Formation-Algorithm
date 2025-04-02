@@ -40,6 +40,8 @@ python3 main.py --input <path/to/file>
 | `-o`             | `--output`        | `path/to/output.csv`  | Path for output file                 | No       | `./output`     |
 | `-n`             | `--no-output`     | `flag`                | Do not generate an output file       | No       | `False`        |
 | `-v`             | `--verbose`       | `flag`                | Generate gurobi solution to console  | No       | `False`        |
+| `--no-gui`       |   -               | `flag`                | Prvent the program to create <br> a graphical user interface  | No       | `True`        |
+
 
 
 <details>

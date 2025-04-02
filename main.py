@@ -14,6 +14,7 @@ def args_parser():
     parser.add_argument("-o", "--output", help="path for output file, default is ./output", type=str)
     parser.add_argument("-n","--no-output", help="Do not generate an output file", action="store_true")  
     parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true")
+    parser.add_argument("--no-gui", help="Do not run the GUI", action="store_true")
     
     args = parser.parse_args()
     file_path = args.input
@@ -22,6 +23,7 @@ def args_parser():
     output_file = args.output
     no_output = args.no_output
     verbose = args.verbose
+    no_gui = args.no_gui
     
     # If user does not specify a file input
     if file_path == None:
@@ -41,16 +43,19 @@ def args_parser():
         number_of_groups = 5
         print(f'Number of groups not specified. Defaulting to 5 groups.')
 
-    return file_path, number_of_groups, print_output, output_file, no_output, verbose
+    return file_path, number_of_groups, print_output, output_file, no_output, verbose,no_gui
     
 
 def main():
 
     try:     
-        path, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose = args_parser()
+        path, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, args_no_gui = args_parser()
         dict_uuid_person = cr.read_csv_pd(path)
-        fm.form_teams(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose) 
-        gui.run_view()
+        
+        if args_no_gui:
+            fm.form_teams(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose) 
+        else:
+            gui.run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose)
 
     except FileNotFoundError as fnfe:
         print(fnfe) # Print the error message

@@ -35,17 +35,18 @@ def compute_stats(team_members):
     return {'total': total, 'leaders': leaders, 'skill': skill_total}
 
 # Run optimizer
-async def run_optimizer():
+async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose):
     global teams_data, team_stats
     loading_container.classes(remove='hidden')
 
     try:
         await run.io_bound(lambda: fm.form_teams(
-            people=person_dict,
-            number_of_groups=5,
-            is_printing_output=False,
-            args_output_file=None,
-            args_no_output=False
+            dict_uuid_person,
+            number_of_groups,
+            is_printing_output,
+            args_output_file,
+            args_no_output,
+            args_verbose,
         ))
 
         output_files = [f for f in os.listdir("output") if f.endswith(".csv")]
@@ -131,7 +132,7 @@ def add_constraint(together=True):
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
-def run_view() -> None:
+def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose) -> None:
 
     with loading_container:
         loading = ui.spinner(size='lg', color='primary').props('thickness=6')
@@ -156,7 +157,10 @@ def run_view() -> None:
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
 
         ui.row().classes("mt-4 gap-4")
-        ui.button("RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("bg-primary text-white")
+        ui.button(
+            "RUN OPTIMIZER WITH CONSTRAINTS",
+                on_click=lambda: run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose)
+                ).classes("bg-primary text-white")        
         ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
 
     # Attach containers
