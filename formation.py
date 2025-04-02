@@ -4,7 +4,12 @@ import time
 import csv
 import random
 
+# Global variable to store last model for saving
+last_model = None
+
 def form_teams(people, number_of_groups, is_printing_output, args_output_file, args_no_output):
+    global last_model
+
     # Load data
     campers = list(people.values())
     num_teams = number_of_groups
@@ -112,20 +117,10 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
         0.75 * prop_imbalance[t]
     ) for t in teams)
 
-    # # Static data
-    # # Constraint: prevent certain campers from being in the same team
-    # not_together = [(7,8), (7,2)]
-    # for (p, q) in not_together:
-    #     for t in teams:
-    #         m += x[p][t] + x[q][t] <= 1
-
-    # be_together = [(0,1), (1,9)]
-    # for (p, q) in be_together:
-    #     for t in teams:
-    #         m += x[p][t] - x[q][t] == 0
-    
-
     m.optimize()
+
+    # Save the model so GUI can access it
+    last_model = m
 
     if m.status == OptimizationStatus.OPTIMAL:
         q9_broken = sum(1 for v in q9_violations if v.x >= 0.99)
@@ -152,21 +147,17 @@ def form_teams(people, number_of_groups, is_printing_output, args_output_file, a
             timestamp = int(time.time())
             output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-
             with open(output_path, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["ID", "First name", "Last name", "Team"])
                 writer.writerows(rows)
 
             print(f"Output saved to: {output_path}")
-    
+
         if is_printing_output:
             for row in rows:
                 print(row)
-            # Print number of people in each team
             for t in teams:
                 print(f"Team {t + 1}: {len([row for row in rows if row[3] == t + 1])}")
-            
-            
     else:
         print("No optimal solution found.")

@@ -68,13 +68,24 @@ async def run_optimizer():
     finally:
         loading_container.classes(add='hidden')
 
+# Save current solution
+def save_solution():
+    try:
+        if fm.last_model is not None:
+            os.makedirs("solutions", exist_ok=True)
+            fm.last_model.write("solutions/last_saved.sol")
+            ui.notify("Solution saved as 'last_saved.sol'", color="positive")
+        else:
+            ui.notify("No model found to save", color="negative")
+    except Exception as e:
+        ui.notify(f"Error saving solution: {e}", color="negative")
+
 # Update team + chart UI
 def update_team_ui():
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
 
-    # Display teams
     for team, members in teams_data:
         with team_container:
             with ui.expansion(f'Team {team}', icon='group').classes('w-full') as exp:
@@ -85,7 +96,6 @@ def update_team_ui():
                         ui.label(f"• {member.first_name} {member.last_name}")
                 team_cards.append(exp)
 
-    # Skill score chart
     labels = [f'Team {team}' for team, _ in teams_data]
     skills = [team_stats[team]['skill'] for team, _ in teams_data]
 
@@ -136,7 +146,9 @@ with ui.column().classes("items-center w-full"):
             diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
             ui.button("Add", on_click=lambda: add_constraint(together=False))
 
-    ui.button("RE-RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("mt-6 bg-primary text-white")
+    ui.row().classes("mt-4 gap-4")
+    ui.button("RUN OPTIMIZER WITH CONSTRAINTS", on_click=run_optimizer).classes("bg-primary text-white")
+    ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
 
 # Attach containers
 team_container
@@ -145,3 +157,4 @@ loading_container
 
 # --- Run app ---
 ui.run()
+
