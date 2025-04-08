@@ -16,3 +16,13 @@ columns = {
     "q9" : "Are you entitled to be in the team with someone, please write their full name - Example kids needs to be with the parent/guardian or new camper wants to be with someone they know. Leave blank for no.", 
     "q10" : "Please list the full names of people who should not be on your team (e.g., spouse, siblings, best friends, people I see (almost) every day). This will help us create teams that encourage meeting new people, fostering new connections, and promoting teamwork with a more diverse group. Being on a team with familiar faces can limit these opportunities.",
 }
+
+columns_relations = {
+    "uuid_1": "uuid_1",
+    "name_1": "name_1",
+    "name_2": "name_2",
+    "uuid_2": "uuid_2",
+    "relation": "relation",
+    "weight": "weight",
+    "description": "description",
+}
