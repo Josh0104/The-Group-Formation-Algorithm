@@ -10,7 +10,7 @@ from person import Person
 # Global variable to store last model for saving
 last_model = None
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose):
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose): 
     global last_model
 
     # Load data
@@ -187,12 +187,12 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         timestamp = int(time.time())
         output_path = os.path.join(output_dir, f"{timestamp}.csv")
 
-        rows = []
         for t in teams:
             for c in camper_ids:
                 if x[c][t].x >= 0.99:
                     camper = campers[c]
-                    rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
+                    # rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
+                    camper.set_team(t + 1)
 
         if args_no_output is not True:
             output_dir = args_output_file if args_output_file != None else "output"
@@ -203,15 +203,19 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             with open(output_path, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["ID", "First name", "Last name", "Team"])
-                writer.writerows(rows)
+                writer.writerows([c.uuid, c.first_name, c.last_name, c.team] for c in campers)
 
             print(f"Output saved to: {output_path}")
 
         if is_printing_output:
-            for row in rows:
-                print(row)
+            for c in campers:
+                print(c)
             for t in teams:
-                print(f"Team {t + 1}: {len([row for row in rows if row[3] == t + 1])}")
+                print(f"Team {t + 1}: {len([c for c in campers if c[3] == t + 1])}")
+        
+        return campers
             
     else:
         print("No optimal solution found.")
+    
+    return None

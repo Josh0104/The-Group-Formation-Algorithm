@@ -21,6 +21,7 @@ class Person :
         self.a8 = a8
         self.a9 = a9
         self.a10 = a10
+        self.team = None
 
 
     def get_age(self) -> int:
@@ -32,6 +33,8 @@ class Person :
 
     def __repr__(self):
         return f"Person(id={self.id}, name='{self.first_name} {self.last_name}', birthday='{self.birthday}')"
+    def set_team(self, team):
+        self.team = team
 
 class Gender(Enum):
     MALE = 1

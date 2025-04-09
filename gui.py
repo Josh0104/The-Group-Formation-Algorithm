@@ -40,7 +40,7 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
     loading_container.classes(remove='hidden')
 
     try:
-        await run.io_bound(lambda: fm.form_teams(
+        campers = await run.io_bound(lambda: fm.form_teams(
             dict_uuid_person,
             number_of_groups,
             is_printing_output,
@@ -49,25 +49,20 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
             args_verbose,
         ))
 
-        output_files = [f for f in os.listdir("output") if f.endswith(".csv")]
-        if not output_files:
-            ui.notify("No output file found", color="negative")
-            return
+        for c in campers:
+            print("printing", c)
+        #     lines = f.readlines()[1:]
+        #     raw_teams = {}
+        #     for line in lines:
+        #         uuid, first, last, team = line.strip().split(",")
+        #         team = int(team)
+        #         person = person_dict.get(uuid)
+        #         if person:
+        #             raw_teams.setdefault(team, []).append(person)
 
-        latest_file = sorted(output_files, key=lambda f: os.path.getmtime(f"output/{f}"))[-1]
-        with open(f"output/{latest_file}", "r") as f:
-            lines = f.readlines()[1:]
-            raw_teams = {}
-            for line in lines:
-                uuid, first, last, team = line.strip().split(",")
-                team = int(team)
-                person = person_dict.get(uuid)
-                if person:
-                    raw_teams.setdefault(team, []).append(person)
-
-        teams_data = sorted(raw_teams.items())
-        team_stats = {team: compute_stats(members) for team, members in teams_data}
-        update_team_ui()
+        # teams_data = sorted(raw_teams.items())
+        # team_stats = {team: compute_stats(members) for team, members in teams_data}
+        # update_team_ui()
 
     finally:
         loading_container.classes(add='hidden')
