@@ -110,10 +110,10 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         1.0 * imbalance[t] +
         1.0 * creativity_imbalance[t] +
         1.0 * bible_imbalance[t] +
-        0.5 * music_imbalance[t] +
-        1.0 * experience_imbalance[t] +
-        0.75 * performance_imbalance[t] + 
-        0.75 * prop_imbalance[t]
+        0.75 * music_imbalance[t] +
+        0.5 * experience_imbalance[t] +
+        1.0 * performance_imbalance[t] + 
+        1.0 * prop_imbalance[t]
     ) for t in teams)
     
     relations = Relations.get_relations(people)
