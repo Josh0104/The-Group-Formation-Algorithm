@@ -91,8 +91,12 @@ def update_team_ui():
                 with ui.column().classes("pl-4"):
                     stat = team_stats[team]
                     ui.label(f"👥 Total Members: {stat['total']} | ⭐ Leaders: {stat['leaders']}")
-                    for member in members:
-                        ui.label(f"• {member.first_name} {member.last_name}")
+                    with ui.column().classes('gap-0'):
+                        num = 0
+                        for member in members:
+                            num += 1
+                            ui.markdown(f"{num}. {member.first_name} {member.last_name}")
+                        
                 team_cards.append(exp)
 
     labels = [f'Team {team}' for team, _ in teams_data]
