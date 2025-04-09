@@ -33,7 +33,7 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 def compute_stats(team_members: list[Person]) -> dict:
     total = len(team_members)
     leaders = sum(1 for p in team_members if "yes" in p.a1)
-    skill_total = sum(3 if "yes" in p.a4 else 1 if "maybe" in p.a4 else 0 for p in team_members)
+    skill_total = sum(p.a4.value for p in team_members if p.a4 is not None)
     return {'total': total, 'leaders': leaders, 'skill': skill_total}
 
 # Run optimizer

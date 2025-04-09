@@ -12,17 +12,16 @@ class Person :
         self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
         self.a1 = a1.lower() if a1 else ""
-        self.a2 = a2.lower() if a2 else ""
-        self.a3 = a3.lower() if a3 else ""
-        self.a4 = a4.lower() if a4 else ""
-        self.a5 = a5.lower() if a5 else ""
-        self.a6 = a6.lower() if a6 else ""
-        self.a7 = a7.lower() if a7 else ""
-        self.a8 = a8.lower() if a8 else ""
+        self.a2 = AnswerOption.from_str(a2) if a2 else None
+        self.a3 = AnswerOption.from_str(a3) if a3 else None
+        self.a4 = AnswerOption.from_str(a4) if a4 else None
+        self.a5 = AnswerOption.from_str(a5) if a5 else None
+        self.a6 = AnswerOption.from_str(a6) if a6 else None
+        self.a7 = AnswerOption.from_str(a7) if a7 else None
+        self.a8 = AnswerOption.from_str(a8) if a8 else None
         self.a9 = a9
         self.a10 = a10
         self.team = None
-
 
     def get_age(self) -> int:
         today = date(2025, 5, 28) # Date of the current camp, change if needed
@@ -40,10 +39,29 @@ class Gender(Enum):
     MALE = 1
     FEMALE = 2
 
+#Enum valuebased on points
 class AnswerOption(Enum):
     NO = 0
     MAYBE = 2
     YES = 3
+    
+    @staticmethod
+    def from_str(value: str) -> 'AnswerOption':
+        if value.lower() == "yes":
+            return AnswerOption.YES
+        elif value.lower() == "maybe":
+            return AnswerOption.MAYBE
+        else:
+            return AnswerOption.NO
+        
+    def __str__(self) -> str: 
+        if self == AnswerOption.YES:
+            return "Yes"
+        elif self == AnswerOption.MAYBE:
+            return "Maybe"
+        else:
+            return "No"
+    
 
 class Relation:
     def __init__(self, id, uuid_1, name_1, name_2, uuid_2, relation, weight, description):

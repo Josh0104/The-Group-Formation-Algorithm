@@ -17,22 +17,17 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     campers = list(people.values())
     num_teams = number_of_groups
 
-    def yes_no_maybe_score(answer):
-        if "yes" in answer.lower(): return 3
-        elif "maybe" in answer.lower(): return 2
-        else: return 1
-
     def is_team_leader(answer):
         return 1 if "yes" in answer.lower() else 0
 
-    skill_levels = [yes_no_maybe_score(p.a4) for p in campers]
+    skill_levels = [p.a4.value for p in campers]
     is_leader = [is_team_leader(p.a1) for p in campers]
-    creativity = [yes_no_maybe_score(p.a2) for p in campers]
-    bible_knowledge = [yes_no_maybe_score(p.a3) for p in campers]
-    musical_ability = [yes_no_maybe_score(p.a5) for p in campers]
-    camp_experience = [yes_no_maybe_score(p.a6) for p in campers]
-    performance_experience = [yes_no_maybe_score(p.a7) for p in campers]
-    prop_design = [yes_no_maybe_score(p.a8) for p in campers]
+    creativity = [p.a2.value for p in campers]
+    bible_knowledge = [p.a3.value for p in campers]
+    musical_ability = [p.a5.value for p in campers]
+    camp_experience = [p.a6.value for p in campers]
+    performance_experience = [p.a7.value for p in campers]
+    prop_design = [p.a8.value for p in campers]
 
     num_campers = len(campers)
     teams = range(num_teams)
