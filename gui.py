@@ -1,4 +1,4 @@
-from nicegui import ui, run
+from nicegui import ui, run, app
 import csv_reader as cr
 import formation as fm
 from formation import Person  # Ensure Person is imported from the correct module
@@ -93,6 +93,7 @@ def update_team_ui():
                     ui.label(f"👥 Total Members: {stat['total']} | ⭐ Leaders: {stat['leaders']}")
                     with ui.column().classes('gap-0'):
                         num = 0
+                        members = sorted(members, key=lambda x: (x.first_name, x.last_name))
                         for member in members:
                             num += 1
                             ui.markdown(f"{num}. {member.first_name} {member.last_name}")
@@ -166,6 +167,9 @@ def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output
     team_container
     chart_container
     loading_container
+    
+    #select the text with native window - https://www.reddit.com/r/nicegui/comments/1gtmvuh/comment/lxq1u1q/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button 
+    app.native.window_args['text_select'] = True
 
     # --- Run app ---
     ui.run(native=True)
