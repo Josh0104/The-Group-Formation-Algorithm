@@ -1,6 +1,7 @@
 from nicegui import ui, run
 import csv_reader as cr
 import formation as fm
+from formation import Person  # Ensure Person is imported from the correct module
 import os
 
 # Constants
@@ -8,7 +9,7 @@ DATA_PATH = 'data/users.csv'
 
 # Global variables
 person_dict = cr.read_csv_pd(DATA_PATH)
-teams_data = []
+teams_data: list[tuple] = []
 team_stats = {}
 
 # Constraint tracking
@@ -28,10 +29,11 @@ chart_container = ui.row().classes("w-full justify-center mt-8")
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 # Compute stats
-def compute_stats(team_members):
+def compute_stats(team_members: list[Person]) -> dict:
+    print("type(team_members)", type(team_members))
     total = len(team_members)
-    leaders = sum(1 for p in team_members if "yes" in p.a1.lower())
-    skill_total = sum(3 if "yes" in p.a4.lower() else 1 if "maybe" in p.a4.lower() else 0 for p in team_members)
+    leaders = sum(1 for p in team_members if "yes" in p.a1)
+    skill_total = sum(3 if "yes" in p.a4 else 1 if "maybe" in p.a4 else 0 for p in team_members)
     return {'total': total, 'leaders': leaders, 'skill': skill_total}
 
 # Run optimizer
@@ -40,7 +42,7 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
     loading_container.classes(remove='hidden')
 
     try:
-        campers = await run.io_bound(lambda: fm.form_teams(
+        people = await run.io_bound(lambda: fm.form_teams(
             dict_uuid_person,
             number_of_groups,
             is_printing_output,
@@ -49,21 +51,19 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
             args_verbose,
         ))
 
-        for c in campers:
-            print("printing", c)
-        #     lines = f.readlines()[1:]
-        #     raw_teams = {}
-        #     for line in lines:
-        #         uuid, first, last, team = line.strip().split(",")
-        #         team = int(team)
-        #         person = person_dict.get(uuid)
-        #         if person:
-        #             raw_teams.setdefault(team, []).append(person)
+        raw_teams: dict[int, list[Person]] = {}
+        for p in people:
+            if p:
+                raw_teams.setdefault(p.team, []).append(p)
 
-        # teams_data = sorted(raw_teams.items())
-        # team_stats = {team: compute_stats(members) for team, members in teams_data}
-        # update_team_ui()
+        teams_data = sorted(raw_teams.items())
+        # raw_teams = dict(sorted(raw_teams.items()))
 
+        for team, members in teams_data:
+            stats = compute_stats(members)
+            team_stats[team] = stats
+    
+        update_team_ui()
     finally:
         loading_container.classes(add='hidden')
 

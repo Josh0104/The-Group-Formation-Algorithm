@@ -41,7 +41,7 @@ def args_parser():
     
     if number_of_groups == None:
         number_of_groups = 5
-        print(f'Number of groups not specified. Defaulting to 5 groups.')
+        print(f'Number of groups not specified. Defaulting to 5 groups.') if verbose else None
 
     return file_path, number_of_groups, print_output, output_file, no_output, verbose,no_gui
     

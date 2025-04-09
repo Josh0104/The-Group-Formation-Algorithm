@@ -179,8 +179,8 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         q9_broken = sum(1 for v in q9_violations if v.x >= 0.99)
         q10_broken = sum(1 for v in q10_violations if v.x >= 0.99)
 
-        print(f"Q9 (want-to-be-with) violations: {q9_broken}")
-        print(f"Q10 (avoid-this-person) violations: {q10_broken}")
+        # print(f"Q9 (want-to-be-with) violations: {q9_broken}")
+        # print(f"Q10 (avoid-this-person) violations: {q10_broken}")
 
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
