@@ -56,6 +56,10 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     experience_imbalance = [m.add_var() for _ in teams]
     performance_imbalance = [m.add_var() for _ in teams]
     prop_imbalance = [m.add_var() for _ in teams]
+    avg_team_size = num_campers / num_teams # Average team size
+    plus_minus = 2 # Allowable deviation from average team size
+    min_team_size = int(avg_team_size - plus_minus) # Minimum team size (±)
+    max_team_size = int(avg_team_size + plus_minus) # Maximum team size (±)
 
     for t in teams:
         m += imbalance[t] >= xsum(skill_levels[c] * x[c][t] for c in camper_ids) - avg_skill
@@ -73,6 +77,8 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
+        m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
+        m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
 
 
     epsilon = 0.01
@@ -102,6 +108,14 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         elif relation == 'SEPARATE':
             relations_separate.append((id_1, id_2))
             
+        for (p, q) in relations_separate:
+            for t in teams:
+                m += x[p][t] + x[q][t] <= 1
+
+        for (p, q) in relations_together:
+            for t in teams:
+                m += x[p][t] - x[q][t] == 0
+                
         # uuid_1 = r['uuid_1']
         # uuid_2 = r['uuid_2']
         # relation = r['relation']
@@ -127,13 +141,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     # Constraint: prevent certain campers from being in the same team
     
     # not_together = [(7,8), (7,2)]
-    for (p, q) in relations_separate:
-        for t in teams:
-            m += x[p][t] + x[q][t] <= 1
-
-    for (p, q) in relations_together:
-        for t in teams:
-            m += x[p][t] - x[q][t] == 0
     
 
     m.optimize()
