@@ -74,35 +74,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
         m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
 
-    name_to_index = {
-        f"{p.first_name.strip().lower()} {p.last_name.strip().lower()}": i
-        for i, p in enumerate(campers)
-    }
-
-    q9_violations = []
-    q10_violations = []
-
-    for i, person in enumerate(campers):
-        if str(person.a9).strip():
-            target = str(person.a9).strip().lower()
-            j = name_to_index.get(target)
-            if j is not None and i != j:
-                v = m.add_var(var_type=BINARY)
-                for t in teams:
-                    m += x[i][t] - x[j][t] <= v
-                    m += x[j][t] - x[i][t] <= v
-                m.objective += 5 * v
-                q9_violations.append(v)
-
-        if str(person.a10).strip():
-            target = str(person.a10).strip().lower()
-            j = name_to_index.get(target)
-            if j is not None and i != j:
-                v = m.add_var(var_type=BINARY)
-                for t in teams:
-                    m += x[i][t] + x[j][t] <= 1 + v
-                m.objective += 10 * v
-                q10_violations.append(v)
 
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
@@ -171,11 +142,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     last_model = m
 
     if m.status == OptimizationStatus.OPTIMAL:
-        q9_broken = sum(1 for v in q9_violations if v.x >= 0.99)
-        q10_broken = sum(1 for v in q10_violations if v.x >= 0.99)
-
-        # print(f"Q9 (want-to-be-with) violations: {q9_broken}")
-        # print(f"Q10 (avoid-this-person) violations: {q10_broken}")
 
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
