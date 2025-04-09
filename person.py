@@ -9,7 +9,7 @@ class Person :
         self.last_name = last_name
         self.name = first_name + " " + last_name
         self.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
-        self.gender = gender
+        self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
         self.a1 = a1.lower() if a1 else ""
         self.a2 = a2.lower() if a2 else ""

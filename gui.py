@@ -2,6 +2,7 @@ from nicegui import ui, run
 import csv_reader as cr
 import formation as fm
 from formation import Person  # Ensure Person is imported from the correct module
+from person import Gender
 import os
 
 # Constants
@@ -30,7 +31,6 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
-    print("type(team_members)", type(team_members))
     total = len(team_members)
     leaders = sum(1 for p in team_members if "yes" in p.a1)
     skill_total = sum(3 if "yes" in p.a4 else 1 if "maybe" in p.a4 else 0 for p in team_members)
@@ -62,7 +62,7 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
         for team, members in teams_data:
             stats = compute_stats(members)
             team_stats[team] = stats
-    
+
         update_team_ui()
     finally:
         loading_container.classes(add='hidden')
