@@ -40,10 +40,10 @@ class Gender(Enum):
     MALE = 1
     FEMALE = 2
 
-class SurveyResponse(Enum):
-    YES = 1
-    NO = 2
-    MAYBE = 3
+class AnswerOption(Enum):
+    NO = 0
+    MAYBE = 2
+    YES = 3
 
 class Relation:
     def __init__(self, id, uuid_1, name_1, name_2, uuid_2, relation, weight, description):
