@@ -145,13 +145,13 @@ def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output
 
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
-                ui.label("Force people on same team").classes("font-semibold")
+                ui.label("🫂 Must be on the same team").classes("font-semibold")
                 same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
                 same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
                 ui.button("Add", on_click=lambda: add_constraint(together=True))
 
             with ui.column().classes("items-center"):
-                ui.label("Force people on different teams").classes("font-semibold")
+                ui.label("🚫 Must be on different teams").classes("font-semibold")
                 diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
                 diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
@@ -172,4 +172,4 @@ def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output
     app.native.window_args['text_select'] = True
 
     # --- Run app ---
-    ui.run(native=True)
+    ui.run(native=True, title="Team Optimizer", dark=True)
