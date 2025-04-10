@@ -173,4 +173,4 @@ def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output
     app.native.window_args['text_select'] = True
 
     # --- Run app ---
-    ui.run(native=True, title="Team Optimizer", dark=True)
+    ui.run(native=True, title="Team Optimizer")

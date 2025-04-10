@@ -2,7 +2,7 @@ import os
 import csv_reader as cr
 import formation as fm
 import argparse
-import gui
+import pages.index as index
 
 # Reading arguments
 def args_parser():
@@ -55,7 +55,7 @@ def main():
         if args_no_gui:
             fm.form_teams(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose) 
         else:
-            gui.run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose)
+            index.run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose)
 
     except FileNotFoundError as fnfe:
         print(fnfe) # Print the error message
