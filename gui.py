@@ -64,6 +64,7 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
             team_stats[team] = stats
 
         update_team_ui()
+        ui.notify(f"Teams saved under output folder!\n", color="positive") if args_no_output == None else None
     finally:
         loading_container.classes(add='hidden')
 
