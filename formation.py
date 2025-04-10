@@ -5,6 +5,7 @@ import time
 import csv
 import random
 import relations as Relations
+from datetime import datetime
 from person import Person
 
 # Global variable to store last model for saving
@@ -165,9 +166,9 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         if args_no_output is not True:
             output_dir = args_output_file if args_output_file != None else "output"
             os.makedirs(output_dir, exist_ok=True)
-            timestamp = int(time.time())
-            output_path = os.path.join(output_dir, f"{timestamp}.csv")
-
+            timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            output_path = os.path.join(output_dir, f"teams_{timestamp}.csv")
+            
             with open(output_path, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(["ID", "First name", "Last name", "Team"])
