@@ -19,7 +19,14 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     num_teams = number_of_groups
 
     def is_team_leader(answer):
+        # if "yes" in answer.lower() : 
+        #     return 3
+        # elif "co-lead" in answer.lower() :
+        #     return 1
+        # else :
+        #     return 0
         return 1 if "yes" in answer.lower() else 0
+    
 
     skill_levels = [p.a4.value for p in campers]
     is_leader = [is_team_leader(p.a1) for p in campers]
@@ -102,19 +109,21 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         id_1 = r['id_1']
         id_2 = r['id_2']
         relation = r['relation']
-        print(f"Relation: {r['relation']}, {id_1}, {id_2} {r['name_1']}, {r['name_2']}, {r['relation']}")
+        name_1 = r['name_1']
+        name_2 = r['name_2']
+        print(f"Relation: {r['relation']}, {id_1}, {id_2} {name_1}, {name_2}, {r['relation']}") if args_verbose else None
         
         if relation == 'TOGETHER':
             relations_together.append((id_1, id_2))
         elif relation == 'SEPARATE':
             relations_separate.append((id_1, id_2))
             
-        for (p, q) in relations_separate:
-            for t in teams:
-                m += x[p][t] + x[q][t] <= 1
+    for (p, q) in relations_separate:
+        for t in teams:
+            m += x[p][t] + x[q][t] <= 1
 
-        for (p, q) in relations_together:
-            for t in teams:
+    for (p, q) in relations_together:
+        for t in teams:
                 m += x[p][t] - x[q][t] == 0
                 
         # uuid_1 = r['uuid_1']

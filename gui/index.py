@@ -1,9 +1,13 @@
 from nicegui import ui, run, app
 import csv_reader as cr
 import formation as fm
-from formation import Person  # Ensure Person is imported from the correct module
+from formation import Person
 from person import Gender
+import gui.header as header
 import os
+import main as main
+
+header.header()
 
 # Constants
 DATA_PATH = 'data/users.csv'
@@ -18,12 +22,13 @@ same_team_constraints = []
 diff_team_constraints = []
 
 same_a = None
-diff_a = None
+diff_a = None  
 same_b = None
 diff_b = None
 team_cards = []
 loading_container = None
 loading = None
+
 # UI elements
 team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
 chart_container = ui.row().classes("w-full justify-center mt-8")
@@ -37,24 +42,20 @@ def compute_stats(team_members: list[Person]) -> dict:
     return {'total': total, 'leaders': leaders, 'skill': skill_total}
 
 # Run optimizer
-async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose):
+async def run_optimizer():
     global teams_data, team_stats
     loading_container.classes(remove='hidden')
 
     try:
-        people = await run.io_bound(lambda: fm.form_teams(
-            dict_uuid_person,
-            number_of_groups,
-            is_printing_output,
-            args_output_file,
-            args_no_output,
-            args_verbose,
-        ))
+        people = await run.io_bound(lambda: main.run_formation())
+        
+        if people is None:
+            ui.notify("No solution found", color="negative")
+            return
 
         raw_teams: dict[int, list[Person]] = {}
         for p in people:
-            if p:
-                raw_teams.setdefault(p.team, []).append(p)
+            raw_teams.setdefault(p.team, []).append(p)
 
         teams_data = sorted(raw_teams.items())
         # raw_teams = dict(sorted(raw_teams.items()))
@@ -64,7 +65,6 @@ async def run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, 
             team_stats[team] = stats
 
         update_team_ui()
-        ui.notify(f"Teams saved under output folder!\n", color="positive") if args_no_output == None else None
     finally:
         loading_container.classes(add='hidden')
 
@@ -132,9 +132,8 @@ def add_constraint(together=True):
         if constraint not in diff_team_constraints:
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
-
-def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose) -> None:
-
+            
+def run_gui() -> None:
     with loading_container:
         loading = ui.spinner(size='lg', color='primary').props('thickness=6')
         loading_text = ui.label("Optimizing teams... Please wait").classes("text-md")
@@ -160,7 +159,7 @@ def run_view(dict_uuid_person, number_of_groups, is_printing_output, args_output
         ui.row().classes("mt-4 gap-4")
         ui.button(
             "RUN OPTIMIZER WITH CONSTRAINTS",
-                on_click=lambda: run_optimizer(dict_uuid_person, number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose)
+                on_click=lambda: run_optimizer()
                 ).classes("bg-primary text-white")        
         ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
 

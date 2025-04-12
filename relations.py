@@ -12,7 +12,6 @@ def get_relations(people: dict[str, Person]) -> dict:
     
     with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';')
-        print("CSV header:", reader.fieldnames)
         for i, row in enumerate(reader, start=0):  # start=0 to match line numbers
             uuid_1 = row['uuid_1']
             name_1 = row['name_1']

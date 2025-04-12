@@ -42,7 +42,7 @@ class Gender(Enum):
 #Enum valuebased on points
 class AnswerOption(Enum):
     NO = 0
-    MAYBE = 2
+    MAYBE = 1
     YES = 3
     
     @staticmethod
