@@ -1,7 +1,14 @@
 # gui/layout.py
-from nicegui import ui
+from nicegui import app, ui
 
 def add_layout():
+
+    dark = ui.dark_mode()
+    if app.storage.general.get('dark_mode', False):
+        dark.enable()
+    else:
+        dark.disable()
+    
     with ui.header().classes('row items-center accent text-white'):
         ui.button(icon='r_list', on_click=lambda: left_drawer.toggle()).props('flat color=white')
         ui.label('Group Formation Builder').classes('text-lg')
