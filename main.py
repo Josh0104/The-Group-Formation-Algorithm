@@ -2,7 +2,7 @@ import os
 import argparse
 import csv_reader as cr
 import formation as fm
-import gui.index as gui
+import gui.main_view as gui
 import app_config
 
 def args_parser():

@@ -3,11 +3,11 @@ import csv_reader as cr
 import formation as fm
 from formation import Person
 from person import Gender
-import gui.header as header
 import os
 import main as main
+from gui.layout import add_layout
 
-header.header()
+
 
 # Constants
 DATA_PATH = 'data/users.csv'
@@ -30,9 +30,51 @@ loading_container = None
 loading = None
 
 # UI elements
+
+loading_container = None  # Declare loading_container globally before assignment
 team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
 chart_container = ui.row().classes("w-full justify-center mt-8")
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
+
+@ui.page('/')
+def dashboard() -> None:
+    add_layout()
+    global team_container, chart_container, loading_container
+
+    # --- Layout ---
+    with ui.column().classes("items-center w-full"):
+        team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
+        chart_container = ui.row().classes("w-full justify-center mt-8")
+        loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
+        
+        
+        ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
+        # ui.separator()
+
+        with ui.row().classes("mt-6 justify-center gap-10"):
+            with ui.column().classes("items-center"):
+                ui.label("🫂 Must be on the same team").classes("font-semibold")
+                same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
+                same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                ui.button("Add", on_click=lambda: add_constraint(together=True))
+
+            with ui.column().classes("items-center"):
+                ui.label("🚫 Must be on different teams").classes("font-semibold")
+                diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
+                diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                ui.button("Add", on_click=lambda: add_constraint(together=False))
+
+        ui.row().classes("mt-4 gap-4")
+        ui.button(
+            "RUN OPTIMIZER WITH CONSTRAINTS",
+                on_click=lambda: run_optimizer()
+                ).classes("bg-primary text-white")        
+        ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
+    
+    
+        with loading_container:
+            ui.spinner(size='lg', color='primary').props('thickness=6')
+            ui.label("Optimizing teams... Please wait").classes("text-md")
 
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
@@ -45,7 +87,7 @@ def compute_stats(team_members: list[Person]) -> dict:
 async def run_optimizer():
     global teams_data, team_stats
     loading_container.classes(remove='hidden')
-
+    
     try:
         people = await run.io_bound(lambda: main.run_formation())
         
@@ -65,6 +107,11 @@ async def run_optimizer():
             team_stats[team] = stats
 
         update_team_ui()
+    
+    except Exception as e:
+        ui.notify(f"Error running optimizer: {e}", color="negative")
+        print(f"Error: {e}")
+    
     finally:
         loading_container.classes(add='hidden')
 
@@ -82,6 +129,8 @@ def save_solution():
 
 # Update team + chart UI
 def update_team_ui():
+    global team_container, chart_container, loading_container
+
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
@@ -116,6 +165,8 @@ def update_team_ui():
                 'itemStyle': {'color': '#4F46E5'}
             }]
         }).classes("w-full max-w-4xl")
+        
+        ui.separator()
 
 # Constraints
 def add_constraint(together=True):
@@ -132,44 +183,10 @@ def add_constraint(together=True):
         if constraint not in diff_team_constraints:
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
-            
-def run_gui() -> None:
-    with loading_container:
-        loading = ui.spinner(size='lg', color='primary').props('thickness=6')
-        loading_text = ui.label("Optimizing teams... Please wait").classes("text-md")
-
-    # --- Layout ---
-    with ui.column().classes("items-center w-full"):
-        ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
-        ui.separator()
-
-        with ui.row().classes("mt-6 justify-center gap-10"):
-            with ui.column().classes("items-center"):
-                ui.label("🫂 Must be on the same team").classes("font-semibold")
-                same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-                same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
-                ui.button("Add", on_click=lambda: add_constraint(together=True))
-
-            with ui.column().classes("items-center"):
-                ui.label("🚫 Must be on different teams").classes("font-semibold")
-                diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-                diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
-                ui.button("Add", on_click=lambda: add_constraint(together=False))
-
-        ui.row().classes("mt-4 gap-4")
-        ui.button(
-            "RUN OPTIMIZER WITH CONSTRAINTS",
-                on_click=lambda: run_optimizer()
-                ).classes("bg-primary text-white")        
-        ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
 
     # Attach containers
     team_container
     chart_container
     loading_container
     
-    #select the text with native window - https://www.reddit.com/r/nicegui/comments/1gtmvuh/comment/lxq1u1q/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button 
-    app.native.window_args['text_select'] = True
 
-    # --- Run app ---
-    ui.run(native=True, title="Team Optimizer")
