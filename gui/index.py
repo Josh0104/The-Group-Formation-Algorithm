@@ -190,9 +190,6 @@ def add_constraint(together=True):
             diff_team_constraints.append(constraint)
             ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
-    # Attach containers
-    team_container
-    chart_container
-    loading_container
+
     
 
