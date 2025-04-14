@@ -54,14 +54,20 @@ def dashboard() -> None:
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
                 ui.label("🫂 Must be on the same team").classes("font-semibold")
-                same_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-                same_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                option_select = [f'{p.first_name} {p.last_name}' for p in person_dict.values()]
+                option_select = sorted(option_select)
+                together_a = ui.select(options=option_select, label="Person A", with_input=True,
+          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+                together_b = ui.select(options=option_select, label="Person B", with_input=True,
+          on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=True))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
-                diff_a = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person A")
-                diff_b = ui.select([f'{p.first_name} {p.last_name}' for p in person_dict.values()], label="Person B")
+                separate_a = ui.select(options=option_select, label="Person A", with_input=True,
+          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+                separate_b = ui.select(options=option_select, label="Person B", with_input=True,
+          on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
 
         ui.row().classes("mt-4 gap-4")
