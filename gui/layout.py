@@ -13,9 +13,9 @@ def add_layout():
         ui.button(icon='r_list', on_click=lambda: left_drawer.toggle()).props('flat color=white')
         ui.label('Group Formation Builder').classes('text-lg')
         ui.space()
-        ui.button('Dashboard', on_click=lambda: ui.navigate.to('/')).props('color=dark:blue-800')
-        ui.button('Results', on_click=lambda: ui.navigate.to('/results')).props('color=dark:blue-800')
-        ui.button('Settings', on_click=lambda: ui.navigate.to('/settings')).props('color=dark:blue-800')
+        ui.button('Dashboard', on_click=lambda: ui.navigate.to('/')).props('color=dark:blue-900')
+        ui.button('Results', on_click=lambda: ui.navigate.to('/results')).props('color=dark:blue-900')
+        ui.button('Settings', on_click=lambda: ui.navigate.to('/settings')).props('color=dark:blue-900')
 
     with ui.left_drawer(value=False).classes("w-full") as left_drawer:
         ui.label('Side Menu')
