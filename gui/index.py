@@ -7,8 +7,6 @@ import os
 import main as main
 from gui.layout import add_layout
 
-
-
 # Constants
 DATA_PATH = 'data/users.csv'
 
@@ -106,7 +104,6 @@ async def run_optimizer():
             raw_teams.setdefault(p.team, []).append(p)
 
         teams_data = sorted(raw_teams.items())
-        # raw_teams = dict(sorted(raw_teams.items()))
 
         for team, members in teams_data:
             stats = compute_stats(members)
