@@ -9,15 +9,15 @@ def add_layout():
     else:
         dark.disable()
     
-    with ui.header().classes('row items-center accent text-white'):
+    with ui.header().classes('row items-center accent text-white dark:bg-blue-950'):
         ui.button(icon='r_list', on_click=lambda: left_drawer.toggle()).props('flat color=white')
         ui.label('Group Formation Builder').classes('text-lg')
         ui.space()
-        ui.button('Dashboard', on_click=lambda: ui.navigate.to('/'))
-        ui.button('Results', on_click=lambda: ui.navigate.to('/results'))
-        ui.button('Settings', on_click=lambda: ui.navigate.to('/settings'))
+        ui.button('Dashboard', on_click=lambda: ui.navigate.to('/')).props('color=dark:blue-800')
+        ui.button('Results', on_click=lambda: ui.navigate.to('/results')).props('color=dark:blue-800')
+        ui.button('Settings', on_click=lambda: ui.navigate.to('/settings')).props('color=dark:blue-800')
 
-    with ui.left_drawer(value=False).classes("bg-blue-100 w-full") as left_drawer:
+    with ui.left_drawer(value=False).classes("w-full") as left_drawer:
         ui.label('Side Menu')
 
     with ui.footer(value=False) as footer:

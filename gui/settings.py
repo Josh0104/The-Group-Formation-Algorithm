@@ -6,7 +6,6 @@ def settings():
     add_layout()
 
     dark = ui.dark_mode()
-    is_dark_mode = app.storage.general.get('dark_mode', False)
 
     with ui.column().classes("items-center w-full"):
         ui.label('⚙️ Settings').classes('text-3xl font-bold align-center mt-4')

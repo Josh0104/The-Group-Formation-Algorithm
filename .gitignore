@@ -11,6 +11,10 @@
 # Ignore all csv file in output directory
 /output/*.csv
 
+# ignoire .nicegui folder that holds storages 
+/.nicegui/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
