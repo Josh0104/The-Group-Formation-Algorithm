@@ -34,6 +34,50 @@ class Person :
         return f"Person(id={self.id}, name='{self.first_name} {self.last_name}', birthday='{self.birthday}')"
     def set_team(self, team):
         self.team = team
+    
+    def to_dict(self) -> dict: # convert Person → dict
+        return {
+            'id': self.id,
+            'uuid': self.uuid,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'birthday': self.birthday.isoformat(),  # datetime to string
+            'gender': self.gender.name,             # Enum to string
+            'country': self.country,
+            'a1': self.a1,
+            'a2': self.a2.name if self.a2 else None,
+            'a3': self.a3.name if self.a3 else None,
+            'a4': self.a4.name if self.a4 else None,
+            'a5': self.a5.name if self.a5 else None,
+            'a6': self.a6.name if self.a6 else None,
+            'a7': self.a7.name if self.a7 else None,
+            'a8': self.a8.name if self.a8 else None,
+            'a9': self.a9,
+            'a10': self.a10,
+            'team': self.team
+        }
+    
+    @staticmethod
+    def from_dict(data) -> 'Person': # convert dict → Person
+        return Person(
+            id=data['id'],
+            uuid=data['uuid'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            birthday=data['birthday'],
+            gender=data['gender'],
+            country=data['country'],
+            a1=data['a1'],
+            a2=data['a2'],
+            a3=data['a3'],
+            a4=data['a4'],
+            a5=data['a5'],
+            a6=data['a6'],
+            a7=data['a7'],
+            a8=data['a8'],
+            a9=data['a9'],
+            a10=data['a10'],
+        )
 
 class Gender(Enum):
     MALE = 1

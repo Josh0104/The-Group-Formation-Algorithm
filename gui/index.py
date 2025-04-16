@@ -85,7 +85,9 @@ async def run_optimizer():
     
     try:
         people = await run.io_bound(lambda: main.run_formation())
-        
+        people_dicts = [p.to_dict() for p in people]
+        app.storage.user['latest_solution'] = people_dicts # Store the latest solution in app storage user
+
         if people is None:
             ui.notify("No solution found", color="negative")
             return
@@ -126,7 +128,6 @@ def update_team_ui():
     
     team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
     chart_container = ui.row().classes("w-full justify-center mt-8")
-    loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
