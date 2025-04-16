@@ -28,16 +28,11 @@ loading_container = None
 loading = None
 
 # UI elements
-
-loading_container = None  # Declare loading_container globally before assignment
-team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
-chart_container = ui.row().classes("w-full justify-center mt-8")
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 @ui.page('/')
 def dashboard() -> None:
     add_layout()
-    global team_container, chart_container, loading_container
                 
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
@@ -75,9 +70,6 @@ def dashboard() -> None:
             ui.spinner(size='lg', color='primary').props('thickness=6')
             ui.label("Optimizing teams... Please wait").classes("text-md")
         
-        team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
-        chart_container = ui.row().classes("w-full justify-center mt-8")
-        loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
@@ -131,8 +123,10 @@ def save_solution():
 
 # Update team + chart UI
 def update_team_ui():
-    global team_container, chart_container, loading_container
-
+    
+    team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
+    chart_container = ui.row().classes("w-full justify-center mt-8")
+    loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
@@ -156,7 +150,8 @@ def update_team_ui():
     skills = [team_stats[team]['skill'] for team, _ in teams_data]
 
     with chart_container:
-        ui.echart({
+        ui.echart(
+            {
             'title': {'text': 'Total Skill Score per Team'},
             'tooltip': {},
             'xAxis': {'type': 'category', 'data': labels},
@@ -173,7 +168,7 @@ def update_team_ui():
         let start = window.scrollY;
         let end = document.body.scrollHeight;// 450; // Adjust this value to the desired scroll position
         let distance = end - start;
-        let duration = 2000; // duration in ms
+        let duration = 1500; // duration in ms
         let startTime = performance.now();
 
         requestAnimationFrame(function step(currentTime) {
