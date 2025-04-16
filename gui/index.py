@@ -38,13 +38,9 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 def dashboard() -> None:
     add_layout()
     global team_container, chart_container, loading_container
-
-    # --- Layout ---
+                
+    # --- Layout --- 
     with ui.column().classes("items-center w-full"):
-        team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
-        chart_container = ui.row().classes("w-full justify-center mt-8")
-        loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
-        
         
         ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
 
@@ -54,17 +50,17 @@ def dashboard() -> None:
                 option_select = [f'{p.first_name} {p.last_name}' for p in person_dict.values()]
                 option_select = sorted(option_select)
                 together_a = ui.select(options=option_select, label="Person A", with_input=True,
-          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+        on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 together_b = ui.select(options=option_select, label="Person B", with_input=True,
-          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+        on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=True))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
                 separate_a = ui.select(options=option_select, label="Person A", with_input=True,
-          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+        on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 separate_b = ui.select(options=option_select, label="Person B", with_input=True,
-          on_change=lambda e: ui.notify(e.value)).classes('w-40')
+        on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
 
         ui.row().classes("mt-4 gap-4")
@@ -78,6 +74,10 @@ def dashboard() -> None:
         with loading_container:
             ui.spinner(size='lg', color='primary').props('thickness=6')
             ui.label("Optimizing teams... Please wait").classes("text-md")
+        
+        team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
+        chart_container = ui.row().classes("w-full justify-center mt-8")
+        loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
@@ -136,8 +136,6 @@ def update_team_ui():
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
-    
-   
 
     for team, members in teams_data:
         with team_container:
@@ -170,7 +168,29 @@ def update_team_ui():
             }]
         }).classes("w-full max-w-4xl")
         
-        ui.separator()
+        # Scroll down to the results
+        ui.run_javascript('''
+        let start = window.scrollY;
+        let end = document.body.scrollHeight;// 450; // Adjust this value to the desired scroll position
+        let distance = end - start;
+        let duration = 2000; // duration in ms
+        let startTime = performance.now();
+
+        requestAnimationFrame(function step(currentTime) {
+            let elapsed = currentTime - startTime;
+            let progress = Math.min(elapsed / duration, 1);
+            let ease = progress < 0.5
+                ? 2 * progress * progress 
+                : -1 + (4 - 2 * progress) * progress;
+
+            window.scrollTo(0, start + distance * ease);
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        });
+        ''')
+        
 
 # Constraints
 def add_constraint(together=True):
