@@ -47,7 +47,6 @@ def dashboard() -> None:
         
         
         ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
-        # ui.separator()
 
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
@@ -137,6 +136,8 @@ def update_team_ui():
     team_container.clear()
     team_cards.clear()
     chart_container.clear()
+    
+   
 
     for team, members in teams_data:
         with team_container:

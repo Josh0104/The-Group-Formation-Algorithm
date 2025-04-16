@@ -7,7 +7,7 @@ def get_relations(people: dict[str, Person]) -> dict:
     """
     Reads the relations CSV file and returns a dictionary of relations.
     """
-    file_path = os.path.join(os.path.dirname(__file__), 'data/relations', 'relations2.csv')
+    file_path = os.path.join(os.path.dirname(__file__), 'data/', 'relations.csv')
     relations = {}
     
     with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
