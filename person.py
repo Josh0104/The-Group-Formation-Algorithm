@@ -1,3 +1,4 @@
+
 from datetime import date, datetime
 from enum import Enum
 
@@ -22,6 +23,7 @@ class Person :
         self.a9 = a9
         self.a10 = a10
         self.team = None
+        self.age = self.get_age()
 
     def get_age(self) -> int:
         today = date(2025, 5, 28) # Date of the current camp, change if needed

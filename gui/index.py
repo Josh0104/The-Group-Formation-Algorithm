@@ -2,7 +2,7 @@ from nicegui import ui, run, app
 import csv_reader as cr
 import formation as fm
 from formation import Person
-from person import Gender
+from person import Gender, AnswerOption
 import os
 import main as main
 from gui.layout import add_layout
@@ -76,7 +76,8 @@ def compute_stats(team_members: list[Person]) -> dict:
     total = len(team_members)
     leaders = sum(1 for p in team_members if "yes" in p.a1)
     skill_total = sum(p.a4.value for p in team_members if p.a4 is not None)
-    return {'total': total, 'leaders': leaders, 'skill': skill_total}
+    total_musicians = sum(1 for p in team_members if p.a5 == AnswerOption.YES)
+    return {'total': total, 'leaders': leaders, 'skill': skill_total, 'musicians': total_musicians}
 
 # Run optimizer
 async def run_optimizer():
@@ -134,18 +135,48 @@ def update_team_ui():
 
     for team, members in teams_data:
         with team_container:
-            with ui.expansion(f'Team {team}', icon='group').classes('w-full') as exp:
+            stat = team_stats[team]
+            with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
                 with ui.column().classes("pl-4"):
-                    stat = team_stats[team]
-                    ui.label(f"👥 Total Members: {stat['total']} | ⭐ Leaders: {stat['leaders']}")
-                    with ui.column().classes('gap-0'):
-                        num = 0
-                        members = sorted(members, key=lambda x: (x.first_name, x.last_name))
-                        for member in members:
-                            num += 1
-                            ui.markdown(f"{num}. {member.first_name} {member.last_name}")
-                        
-                team_cards.append(exp)
+                    # Categorize by age + gender
+                    def get_age_category(person: Person) -> str:
+                        age = person.get_age()
+                        if age > 24:
+                            return "Male" if person.gender == Gender.MALE else "Female"
+                        elif 13 <= age <= 24:
+                            return "Youth"
+                        elif 5 <= age <= 12:
+                            return "Kids"
+                        else:
+                            return "Babies"
+
+                    # Inside your UI rendering:
+                    categories = {
+                        "Male": [],
+                        "Female": [],
+                        "Youth": [],
+                        "Kids": [],
+                        "Babies": [],
+                    }
+
+                    # Fill buckets
+                    for m in members:
+                        cat = get_age_category(m)
+                        categories[cat].append(m)
+
+                    # Display in order, sorted alphabetically within each category
+                    category_order = ["Male", "Female", "Youth", "Kids", "Babies"]
+                    num = 0
+
+                    for cat in category_order:
+                        people = sorted(categories[cat], key=lambda x: (x.first_name.lower(), x.last_name.lower()))
+                        if people:
+                            ui.label(f"👤 {cat} - {len(people)}").classes("font-semibold mt-2")
+                            for person in people:
+                                num += 1
+                                ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
+                                
+                                team_cards.append(exp)
 
     labels = [f'Team {team}' for team, _ in teams_data]
     skills = [team_stats[team]['skill'] for team, _ in teams_data]
@@ -186,6 +217,31 @@ def update_team_ui():
             }
         });
         ''')
+
+def label_roles(person : Person) -> str:
+    roles = []
+    if "yes" in person.a1:
+        roles.append("👑") 
+    if person.a5 == AnswerOption.YES:
+        roles.append("🎶")
+    if person.a3 == AnswerOption.YES:
+        roles.append("📖")
+    if person.a8 == AnswerOption.YES:
+        roles.append("🎨")
+    if person.a4 == AnswerOption.YES:
+        pass
+    if person.a7 == AnswerOption.YES:
+        roles.append("🕺")
+    elif person.a7 == AnswerOption.MAYBE:
+        roles.append("(🕺)")
+        # roles.append("Skill")
+    if person.a4 == AnswerOption.YES:
+        roles.append("🏃")
+    if person.a6 == AnswerOption.YES:
+        pass
+        # roles.append("Camp Experience")
+    return ' '.join(roles) if roles else ""
+    
         
 
 # Constraints
