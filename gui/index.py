@@ -230,24 +230,34 @@ def label_roles(person : Person) -> str:
     roles = []
     if "yes" in person.a1:
         roles.append("👑") 
+    elif person.a1 == AnswerOption.MAYBE:
+        roles.append("(👑)")
+        
+    if person.a2 == AnswerOption.YES:
+        roles.append("💡")
+    elif person.a2 == AnswerOption.MAYBE:
+        roles.append("(💡)")
+        
     if person.a5 == AnswerOption.YES:
         roles.append("🎶")
+        
     if person.a3 == AnswerOption.YES:
         roles.append("📖")
+        
     if person.a8 == AnswerOption.YES:
         roles.append("🎨")
-    if person.a4 == AnswerOption.YES:
-        pass
+        
     if person.a7 == AnswerOption.YES:
         roles.append("🕺")
     elif person.a7 == AnswerOption.MAYBE:
         roles.append("(🕺)")
-        # roles.append("Skill")
+        
+    if person.a4 == AnswerOption.YES:
+        pass
     if person.a4 == AnswerOption.YES:
         roles.append("🏃")
-    if person.a6 == AnswerOption.YES:
-        pass
-        # roles.append("Camp Experience")
+    if person.a6 == AnswerOption.NO:
+        roles.append("🆕")
     return ' '.join(roles) if roles else ""
     
         
