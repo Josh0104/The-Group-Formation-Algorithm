@@ -19,6 +19,8 @@ def add_layout():
 
     with ui.left_drawer(value=False).classes("w-full") as left_drawer:
         ui.label('Side Menu')
+        ui.button('Quit', on_click=app.shutdown, color='negative')
+
 
     with ui.footer(value=False) as footer:
         ui.label('Version 0.0')
