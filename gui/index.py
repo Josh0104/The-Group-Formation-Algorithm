@@ -33,7 +33,8 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 @ui.page('/')
 def dashboard() -> None:
     add_layout()
-                
+    global team_container, chart_container
+
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
         
@@ -65,10 +66,12 @@ def dashboard() -> None:
                 ).classes("bg-primary text-white")        
         ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
     
-    
-        with loading_container:
-            ui.spinner(size='lg', color='primary').props('thickness=6')
-            ui.label("Optimizing teams... Please wait").classes("text-md")
+         #These start hidden
+        team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
+        chart_container = ui.row().classes("w-full justify-center hidden")
+        # with loading_container:
+        #     ui.spinner(size='lg', color='primary').props('thickness=6')
+        #     ui.label("Optimizing teams... Please wait").classes("text-md")
         
 
 # Compute stats
@@ -126,12 +129,17 @@ def save_solution():
 
 # Update team + chart UI
 def update_team_ui():
-    
-    team_container = ui.column().classes("w-full max-w-4xl mx-auto mt-8 gap-4")
-    chart_container = ui.row().classes("w-full justify-center mt-8")
+    global team_container, chart_container
+    ui.separator()
+    team_container.classes(remove='hidden')
+    chart_container.classes(remove='hidden')
+
     team_container.clear()
-    team_cards.clear()
     chart_container.clear()
+    team_cards.clear()
+    team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4")
+    chart_container = ui.row().classes("w-full justify-center mt-8")
+
 
     for team, members in teams_data:
         with team_container:
