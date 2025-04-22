@@ -206,7 +206,7 @@ def update_team_ui():
         # Scroll down to the results
         ui.run_javascript('''
         let start = window.scrollY;
-        let end = document.body.scrollHeight;// 450; // Adjust this value to the desired scroll position
+        let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
         let distance = end - start;
         let duration = 1500; // duration in ms
         let startTime = performance.now();
