@@ -179,7 +179,7 @@ def update_team_ui():
                     for cat in category_order:
                         people = sorted(categories[cat], key=lambda x: (x.first_name.lower(), x.last_name.lower()))
                         if people:
-                            ui.label(f"👤 {cat} - {len(people)}").classes("font-semibold mt-2")
+                            ui.label(f"{cat} - {len(people)}").classes("font-semibold mt-2")
                             for person in people:
                                 num += 1
                                 ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
