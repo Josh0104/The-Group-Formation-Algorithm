@@ -33,7 +33,7 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 @ui.page('/')
 def dashboard() -> None:
     add_layout()
-    global team_container, chart_container
+    global team_container, chart_container, format_setting_container
 
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
@@ -67,6 +67,7 @@ def dashboard() -> None:
         ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
     
          #These start hidden
+        format_setting_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         chart_container = ui.row().classes("w-full justify-center hidden")
         # with loading_container:
@@ -131,9 +132,11 @@ def save_solution():
 def update_team_ui():
     global team_container, chart_container
     ui.separator()
+    format_setting_container.classes(remove='hidden')
     team_container.classes(remove='hidden')
     chart_container.classes(remove='hidden')
 
+    format_setting_container.clear()
     team_container.clear()
     chart_container.clear()
     team_cards.clear()
@@ -144,8 +147,9 @@ def update_team_ui():
         team_cards.clear()
         display_teams(e)
 
-    selectSortFormatOptions = ["Alphabetical", "Age"]
-    selectSortFormat = ui.select(options=selectSortFormatOptions, value=selectSortFormatOptions[0], on_change=change_sort_format)
+    with format_setting_container:
+        selectSortFormatOptions = ["Alphabetical", "Age"]
+        selectSortFormat = ui.select(options=selectSortFormatOptions, value=selectSortFormatOptions[0], on_change=change_sort_format)
         
     team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4")
     chart_container = ui.row().classes("w-full justify-center mt-8")
