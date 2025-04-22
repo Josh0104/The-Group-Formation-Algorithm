@@ -137,94 +137,121 @@ def update_team_ui():
     team_container.clear()
     chart_container.clear()
     team_cards.clear()
+    
+    def change_sort_format(e):
+        team_container.clear()
+        chart_container.clear()
+        team_cards.clear()
+        display_teams(e)
+
+    selectSortFormatOptions = ["Alphabetical", "Age"]
+    selectSortFormat = ui.select(options=selectSortFormatOptions, value=selectSortFormatOptions[0], on_change=change_sort_format)
+        
     team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4")
     chart_container = ui.row().classes("w-full justify-center mt-8")
 
-
-    for team, members in teams_data:
-        with team_container:
-            stat = team_stats[team]
-            with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
-                with ui.column().classes("pl-4"):
-                    # Categorize by age + gender
-                    def get_age_category(person: Person) -> str:
-                        age = person.get_age()
-                        if age > 24:
-                            return "Male" if person.gender == Gender.MALE else "Female"
-                        elif 13 <= age <= 24:
-                            return "Youth"
-                        elif 5 <= age <= 12:
-                            return "Kids"
-                        else:
-                            return "Babies"
-
-                    # Inside your UI rendering:
-                    categories = {
-                        "Male": [],
-                        "Female": [],
-                        "Youth": [],
-                        "Kids": [],
-                        "Babies": [],
-                    }
-
-                    # Fill buckets
-                    for m in members:
-                        cat = get_age_category(m)
-                        categories[cat].append(m)
-
-                    # Display in order, sorted alphabetically within each category
-                    category_order = ["Male", "Female", "Youth", "Kids", "Babies"]
-                    num = 0
-
-                    for cat in category_order:
-                        people = sorted(categories[cat], key=lambda x: (x.first_name.lower(), x.last_name.lower()))
-                        if people:
-                            ui.label(f"{cat} - {len(people)}").classes("font-semibold mt-2")
-                            for person in people:
+    def display_teams(selectSortFormat):
+        for team, members in teams_data:
+            with team_container:
+                stat = team_stats[team]
+                with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
+                    with ui.column().classes("pl-4"):
+                        # Categorize by age + gender
+                        def sort_alpha():
+                            # Sort members alphabetically
+                            sorted_members = sorted(members, key=lambda x: (x.first_name.lower(), x.last_name.lower()))
+                            num = 0
+                            for person in sorted_members:
                                 num += 1
                                 ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
-                                
                                 team_cards.append(exp)
 
-    labels = [f'Team {team}' for team, _ in teams_data]
-    skills = [team_stats[team]['skill'] for team, _ in teams_data]
+                        def sort_age():
+                            def get_age_category(person: Person) -> str:
+                                age = person.get_age()
+                                if age > 24:
+                                    return "Male" if person.gender == Gender.MALE else "Female"
+                                elif 13 <= age <= 24:
+                                    return "Youth"
+                                elif 5 <= age <= 12:
+                                    return "Kids"
+                                else:
+                                    return "Babies"
 
-    with chart_container:
-        ui.echart(
-            {
-            'title': {'text': 'Total Skill Score per Team'},
-            'tooltip': {},
-            'xAxis': {'type': 'category', 'data': labels},
-            'yAxis': {'type': 'value'},
-            'series': [{
-                'type': 'bar',
-                'data': skills,
-                'itemStyle': {'color': '#4F46E5'}
-            }]
-        }).classes("w-full max-w-4xl")
-        
-        # Scroll down to the results
-        ui.run_javascript('''
-        let start = window.scrollY;
-        let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
-        let distance = end - start;
-        let duration = 1500; // duration in ms
-        let startTime = performance.now();
+                            # Inside your UI rendering:
+                            categories = {
+                                "Male": [],
+                                "Female": [],
+                                "Youth": [],
+                                "Kids": [],
+                                "Babies": [],
+                            }
 
-        requestAnimationFrame(function step(currentTime) {
-            let elapsed = currentTime - startTime;
-            let progress = Math.min(elapsed / duration, 1);
-            let ease = progress < 0.5
-                ? 2 * progress * progress 
-                : -1 + (4 - 2 * progress) * progress;
+                            # Fill buckets
+                            for m in members:
+                                cat = get_age_category(m)
+                                categories[cat].append(m)
 
-            window.scrollTo(0, start + distance * ease);
+                            # Display in order, sorted alphabetically within each category
+                            category_order = ["Male", "Female", "Youth", "Kids", "Babies"]
+                            num = 0
 
-            if (progress < 1) {
-                requestAnimationFrame(step);
-            }
-        });
-        ''')
+                            for cat in category_order:
+                                people = sorted(categories[cat], key=lambda x: (x.first_name.lower(), x.last_name.lower()))
+                                if people:
+                                    ui.label(f"{cat} - {len(people)}").classes("font-semibold mt-2")
+                                    for person in people:
+                                        num += 1
+                                        ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
+                                        
+                                        team_cards.append(exp)
+                        
+                        if selectSortFormat.value == "Alphabetical":
+                            sort_alpha()
+                        elif selectSortFormat.value == "Age":
+                            sort_age()                        
+
+        labels = [f'Team {team}' for team, _ in teams_data]
+        skills = [team_stats[team]['skill'] for team, _ in teams_data]
+
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total Skill Score per Team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': skills,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+            
+            # Scroll down to the results
+            ui.run_javascript('''
+            let start = window.scrollY;
+            let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
+            let distance = end - start;
+            let duration = 1500; // duration in ms
+            let startTime = performance.now();
+
+            requestAnimationFrame(function step(currentTime) {
+                let elapsed = currentTime - startTime;
+                let progress = Math.min(elapsed / duration, 1);
+                let ease = progress < 0.5
+                    ? 2 * progress * progress 
+                    : -1 + (4 - 2 * progress) * progress;
+
+                window.scrollTo(0, start + distance * ease);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            });
+            ''')
+    # Display teams based on selected sort format
+    display_teams(selectSortFormat)
 
 def label_roles(person : Person) -> str:
     roles = []
