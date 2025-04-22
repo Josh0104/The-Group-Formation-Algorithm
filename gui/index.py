@@ -231,28 +231,28 @@ def update_team_ui():
                 }]
             }).classes("w-full max-w-4xl")
             
-            # Scroll down to the results
-        ui.run_javascript('''
-        let start = window.scrollY;
-        let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
-        let distance = end - start;
-        let duration = 1500; // duration in ms
-        let startTime = performance.now();
+    # Scroll down to the results
+    ui.run_javascript('''
+    let start = window.scrollY;
+    let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
+    let distance = end - start;
+    let duration = 1500; // duration in ms
+    let startTime = performance.now();
 
-        requestAnimationFrame(function step(currentTime) {
-            let elapsed = currentTime - startTime;
-            let progress = Math.min(elapsed / duration, 1);
-            let ease = progress < 0.5
-                ? 2 * progress * progress 
-                : -1 + (4 - 2 * progress) * progress;
+    requestAnimationFrame(function step(currentTime) {
+        let elapsed = currentTime - startTime;
+        let progress = Math.min(elapsed / duration, 1);
+        let ease = progress < 0.5
+            ? 2 * progress * progress 
+            : -1 + (4 - 2 * progress) * progress;
 
-            window.scrollTo(0, start + distance * ease);
+        window.scrollTo(0, start + distance * ease);
 
-            if (progress < 1) {
-                requestAnimationFrame(step);
-            }
-        });
-        ''')
+        if (progress < 1) {
+            requestAnimationFrame(step);
+        }
+    });
+    ''')
     # Display teams based on selected sort format
     display_teams(selectSortFormat)
 
