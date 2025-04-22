@@ -173,7 +173,7 @@ def update_team_ui():
                         categories[cat].append(m)
 
                     # Display in order, sorted alphabetically within each category
-                    category_order = ["Male", "Female", "Youth", "Kids", "Babies"]
+                    category_order = [" Male", "Female", "Youth", "Kids", "Babies"]
                     num = 0
 
                     for cat in category_order:
