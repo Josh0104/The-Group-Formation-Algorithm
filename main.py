@@ -21,10 +21,11 @@ def args_parser():
 
     # Validation
     if args.input is None:
-        raise TypeError(
-            '❌ Please specify a file input with -i or --input\n'
-            'Example usage: python3 main.py -i <path/to/file>'
-        )
+        args.input = "data/users.csv"
+        # raise TypeError(
+        #     '❌ Please specify a file input with -i or --input\n'
+        #     'Example usage: python3 main.py -i <path/to/file>'
+        # )
 
     if not os.path.exists(args.input):
         raise FileNotFoundError(
