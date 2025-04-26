@@ -60,28 +60,38 @@ def dashboard() -> None:
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
                 
-        dialog = ui.dialog().props('full-width')
-        table = ui.table(
-            columns=[
-                {'name': k, 'label': k.replace('_', ' ').title(), 'field': k} 
-                for k in ['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description']
-            ],
-            rows=[],
-            row_key='uuid_1',
-        ).classes('w-full')
-
+        # Create empty dialog and table first
+        dialog = ui.dialog()
         with dialog:
             with ui.card():
                 ui.label('Uploaded Relations File').classes('text-xl mb-2')
-                table
+                table = ui.table(
+                    columns=[
+                        {'name': k, 'label': k.replace('_', ' ').title(), 'field': k}
+                        for k in ['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description']
+                    ],
+                    rows=[],
+                    row_key='uuid_1',
+                ).classes('w-full')
 
+        # Handle file upload
         def handle_upload(e: events.UploadEventArguments):
             content = e.content.read().decode('utf-8')
-            reader = csv.DictReader(io.StringIO(content), delimiter='\t')
-            table.rows = list(reader)
-            table.update()
-            dialog.open()
 
+            # Auto detect delimiter (tab or comma)
+            delimiter = '\t' if '\t' in content else ','
+
+            reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
+            rows = list(reader)
+
+            if rows:
+                table.rows = rows
+                table.update()
+                dialog.open()
+            else:
+                ui.notify('No data found in CSV', color='negative')
+
+        # Upload button
         ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
         ui.upload(on_upload=handle_upload).props('accept=".csv"')
 
