@@ -1,4 +1,4 @@
-from nicegui import ui, run, app
+from nicegui import ui, run, app, events
 import csv_reader as cr
 import formation as fm
 from formation import Person
@@ -6,6 +6,7 @@ from person import Gender, AnswerOption
 import os
 import main as main
 from gui.layout import add_layout
+import csv, io
 
 # Constants
 DATA_PATH = 'data/users.csv'
@@ -58,6 +59,31 @@ def dashboard() -> None:
                 separate_b = ui.select(options=option_select, label="Person B", with_input=True,
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 ui.button("Add", on_click=lambda: add_constraint(together=False))
+                
+        dialog = ui.dialog().props('full-width')
+        table = ui.table(
+            columns=[
+                {'name': k, 'label': k.replace('_', ' ').title(), 'field': k} 
+                for k in ['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description']
+            ],
+            rows=[],
+            row_key='uuid_1',
+        ).classes('w-full')
+
+        with dialog:
+            with ui.card():
+                ui.label('Uploaded Relations File').classes('text-xl mb-2')
+                table
+
+        def handle_upload(e: events.UploadEventArguments):
+            content = e.content.read().decode('utf-8')
+            reader = csv.DictReader(io.StringIO(content), delimiter='\t')
+            table.rows = list(reader)
+            table.update()
+            dialog.open()
+
+        ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
+        ui.upload(on_upload=handle_upload).props('accept=".csv"')
 
         ui.row().classes("mt-4 gap-4")
         ui.button(
