@@ -1,3 +1,4 @@
+from datetime import datetime
 from nicegui import ui, run, app, events
 import csv_reader as cr
 import formation as fm
@@ -31,6 +32,8 @@ loading = None
 # UI elements
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
+relationsData = []
+
 @ui.page('/')
 def dashboard() -> None:
     add_layout()
@@ -50,7 +53,9 @@ def dashboard() -> None:
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 together_b = ui.select(options=option_select, label="Person B", with_input=True,
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                ui.button("Add", on_click=lambda: add_constraint(together=True))
+                print("A:", together_a.value)
+                print("B:", together_b.value)
+                ui.button("Add", on_click=lambda: add_constraint({together_a.value, together_b.value}))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
@@ -329,21 +334,34 @@ def label_roles(person : Person) -> str:
         
 
 # Constraints
-def add_constraint(together=True):
-    person_a = same_a.value if together else diff_a.value
-    person_b = same_b.value if together else diff_b.value
-    if not person_a or not person_b or person_a == person_b:
-        return
-    constraint = (person_a, person_b)
-    if together:
-        if constraint not in same_team_constraints:
-            same_team_constraints.append(constraint)
-            ui.notify(f'Added same-team constraint: {person_a} + {person_b}')
-    else:
-        if constraint not in diff_team_constraints:
-            diff_team_constraints.append(constraint)
-            ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
+def add_constraint(relataion_data):
+    
+    print(relataion_data)
+    
+    # person_a = same_a.value if together else diff_a.value
+    # person_b = same_b.value if together else diff_b.value
+    # if not person_a or not person_b or person_a == person_b:
+    #     return
+    # constraint = (person_a, person_b)
+    # if together:
+    #     if constraint not in same_team_constraints:
+    #         same_team_constraints.append(constraint)
+    #         ui.notify(f'Added same-team constraint: {person_a} + {person_b}')
+    # else:
+    #     if constraint not in diff_team_constraints:
+    #         diff_team_constraints.append(constraint)
+    #         ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
+def create_constrain_file(relations):
+    os.makedirs("data", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    path = os.path.join("data", f"relations_{timestamp}.csv")
+    
+    
+    with open(path,"w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow("uuid_1, name_1, uuid_2, name_2, relation", "weigh", "description")
+        writer.writerows([r.uuid_1, r.name_1, r.uuid_2, r.name_2, r.relation, r.weight, r.description] for r in relations)
 
     
 
