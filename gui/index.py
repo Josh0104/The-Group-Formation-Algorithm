@@ -32,7 +32,7 @@ loading = None
 # UI elements
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
-relationsData = []
+relation_data = []
 
 @ui.page('/')
 def dashboard() -> None:
@@ -53,9 +53,8 @@ def dashboard() -> None:
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 together_b = ui.select(options=option_select, label="Person B", with_input=True,
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                print("A:", together_a.value)
-                print("B:", together_b.value)
-                ui.button("Add", on_click=lambda: add_constraint({together_a.value, together_b.value}))
+                ui.button("Add", on_click=lambda: 
+                    add_constraint(together_a, together_b, "together"))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
@@ -63,7 +62,8 @@ def dashboard() -> None:
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
                 separate_b = ui.select(options=option_select, label="Person B", with_input=True,
         on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                ui.button("Add", on_click=lambda: add_constraint(together=False))
+                ui.button("Add", on_click=lambda: add_constraint({separate_a.value, separate_b.value, "separate" }))
+        ui.button("Save relations", on_click=lambda: create_relations_file)
                 
         # Create empty dialog and table first
         dialog = ui.dialog()
@@ -334,9 +334,13 @@ def label_roles(person : Person) -> str:
         
 
 # Constraints
-def add_constraint(relataion_data):
+def add_constraint(select_a, select_b, relation, ):
+    global relation_data
     
-    print(relataion_data)
+    relation_data.append({select_a.value, select_b.value, relation})
+    
+    select_a.value
+    print(relation_data)
     
     # person_a = same_a.value if together else diff_a.value
     # person_b = same_b.value if together else diff_b.value
@@ -352,7 +356,9 @@ def add_constraint(relataion_data):
     #         diff_team_constraints.append(constraint)
     #         ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
-def create_constrain_file(relations):
+def create_relations_file():
+    global relation_data
+    
     os.makedirs("data", exist_ok=True)
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     path = os.path.join("data", f"relations_{timestamp}.csv")
@@ -361,7 +367,7 @@ def create_constrain_file(relations):
     with open(path,"w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow("uuid_1, name_1, uuid_2, name_2, relation", "weigh", "description")
-        writer.writerows([r.uuid_1, r.name_1, r.uuid_2, r.name_2, r.relation, r.weight, r.description] for r in relations)
+        writer.writerows([r.uuid_1, r.name_1, r.uuid_2, r.name_2, r.relation, r.weight, r.description] for r in relation_data)
 
     
 
