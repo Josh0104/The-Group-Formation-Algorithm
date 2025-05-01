@@ -44,26 +44,29 @@ def dashboard() -> None:
         
         ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
 
+        # option_select = [f'{p.first_name} {p.last_name}' for p in person_dict.values()]
+        option_select: dict = {}
+        for p in person_dict.values():
+            full_name = f"{p.first_name} {p.last_name}"
+            option_select[p.uuid,full_name] =  [full_name] # rhs value and lhs label
+            
+                      
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
                 ui.label("🫂 Must be on the same team").classes("font-semibold")
-                option_select = [f'{p.first_name} {p.last_name}' for p in person_dict.values()]
-                option_select = sorted(option_select)
-                together_a = ui.select(options=option_select, label="Person A", with_input=True,
-        on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                together_b = ui.select(options=option_select, label="Person B", with_input=True,
-        on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                ui.button("Add", on_click=lambda: 
-                    add_constraint(together_a, together_b, "together"))
+                together_a = ui.select(options=option_select, label="Person A", with_input=True).classes('w-40')
+                together_b = ui.select(options=option_select, label="Person B", with_input=True).classes('w-40')
+
+                ui.button("Add", on_click=lambda: add_constraint(together_a.value, together_b.value, "together"))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
-                separate_a = ui.select(options=option_select, label="Person A", with_input=True,
-        on_change=lambda e: ui.notify(e.value)).classes('w-40')
-                separate_b = ui.select(options=option_select, label="Person B", with_input=True,
-        on_change=lambda e: ui.notify(e.value)).classes('w-40')
+                separate_a = ui.select(options=option_select, label="Person A", with_input=True).classes('w-40')
+                separate_b = ui.select(options=option_select, label="Person B", with_input=True).classes('w-40')
+                
                 ui.button("Add", on_click=lambda: add_constraint({separate_a.value, separate_b.value, "separate" }))
-        ui.button("Save relations", on_click=lambda: create_relations_file)
+                
+        ui.button("Save and use relations", on_click=lambda: create_relations_file())
                 
         # Create empty dialog and table first
         dialog = ui.dialog()
@@ -331,43 +334,38 @@ def label_roles(person : Person) -> str:
         roles.append("🆕")
     return ' '.join(roles) if roles else ""
     
-        
+relation_data = []
 
-# Constraints
-def add_constraint(select_a, select_b, relation, ):
-    global relation_data
+def add_constraint(a, b, relation_type):
+    print(a, b)
     
-    relation_data.append({select_a.value, select_b.value, relation})
+    if not a or not b or a == b:
+        ui.notify("Invalid selection", color="warning")
+        return
     
-    select_a.value
-    print(relation_data)
-    
-    # person_a = same_a.value if together else diff_a.value
-    # person_b = same_b.value if together else diff_b.value
-    # if not person_a or not person_b or person_a == person_b:
-    #     return
-    # constraint = (person_a, person_b)
-    # if together:
-    #     if constraint not in same_team_constraints:
-    #         same_team_constraints.append(constraint)
-    #         ui.notify(f'Added same-team constraint: {person_a} + {person_b}')
-    # else:
-    #     if constraint not in diff_team_constraints:
-    #         diff_team_constraints.append(constraint)
-    #         ui.notify(f'Added different-team constraint: {person_a} x {person_b}')
 
+    relation_data.append({
+        'uuid_1': a[0],
+        'name_1': a[1],
+        'uuid_2': b[0],
+        'name_2': b[1],
+        'relation': relation_type,
+        'weight': 5,  # default weight or add a slider input
+        'description': '',  # optional input
+    })
+    ui.notify(f"Added constraint: {a[1]} - {b[1]} ({relation_type})")
+    
 def create_relations_file():
-    global relation_data
-    
     os.makedirs("data", exist_ok=True)
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     path = os.path.join("data", f"relations_{timestamp}.csv")
-    
-    
-    with open(path,"w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow("uuid_1, name_1, uuid_2, name_2, relation", "weigh", "description")
-        writer.writerows([r.uuid_1, r.name_1, r.uuid_2, r.name_2, r.relation, r.weight, r.description] for r in relation_data)
 
+    with open(path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description'])
+        for row in relation_data:
+            writer.writerow([row['uuid_1'], row['name_1'], row['uuid_2'], row['name_2'], row['relation'], row['weight'], row['description']])
+
+    ui.notify("Saved the relation file")
     
 

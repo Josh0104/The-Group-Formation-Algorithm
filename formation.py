@@ -126,32 +126,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         for t in teams:
                 m += x[p][t] - x[q][t] == 0
                 
-        # uuid_1 = r['uuid_1']
-        # uuid_2 = r['uuid_2']
-        # relation = r['relation']
-        # weight = r['weight']
-        # description = r['description']
-
-        # if relation == "TOGETHER":
-        #     v = m.add_var(var_type=BINARY)
-        #     for t in teams:
-        #         m += x[name_to_index[uuid_1]][t] - x[name_to_index[uuid_2]][t] <= v
-        #         m += x[name_to_index[uuid_2]][t] - x[name_to_index[uuid_1]][t] <= v
-        #     m.objective += 5 * v
-        #     q9_violations.append(v)
-
-        # elif relation == "SEPARATE":
-        #     v = m.add_var(var_type=BINARY)
-        #     for t in teams:
-        #         m += x[name_to_index[uuid_1]][t] + x[name_to_index[uuid_2]][t] <= 1 + v
-        #     m.objective += 10 * v
-        #     q10_violations.append(v)
-
-    # Static data
-    # Constraint: prevent certain campers from being in the same team
-    
-    # not_together = [(7,8), (7,2)]
-    
 
     m.optimize()
 
