@@ -358,37 +358,44 @@ def label_roles(person : Person) -> str:
     
 relation_data = []
 
-def add_constraint(a, b, relation_type):
+def add_constraint(person_a, person_b, relation_type):
     global relation_data
-    
-    if not a or not b or a == b:
-        ui.notify("Invalid selection", color="warning")
-        return
-    
-    uuid_1 = a[0]
-    name_1 = a[1]
-    uuid_2 = b[0]
-    name_2 = b[1]
 
+    if not person_a or not person_b or person_a == person_b:
+        ui.notify("Invalid selection: can not add relation on same person", color="red")
+        return
+
+    uuid_1, name_1 = person_a
+    uuid_2, name_2 = person_b
+
+    # Check for existing symmetric relation
+    for relation in relation_data:
+        if (
+            (relation['uuid_1'] == uuid_1 and relation['uuid_2'] == uuid_2) or
+            (relation['uuid_1'] == uuid_2 and relation['uuid_2'] == uuid_1)
+        ):
+            ui.notify("Invalid selection: relation already exists", color="red")
+            return
+
+    # Add new symmetric relation
     relation_data.append({
         'uuid_1': uuid_1,
         'name_1': name_1,
         'uuid_2': uuid_2,
         'name_2': name_2,
         'relation': relation_type,
-        'weight': 5,  # default weight or add a slider input
-        'description': '',  # optional input
+        'weight': 5,
+        'description': '',
     })
+
     relation_table.add_row({
         'name_1': name_1,
         'name_2': name_2,
         'relation': relation_type,
-        # 'weight': 5,  # default weight or add a slider input
-        # 'description': '',  # optional input
     })
-    relation_table.run_method('scrollTo', len(relation_table.rows)-1)
-    
-    ui.notify(f"Added constraint: {a[1]} - {b[1]} ({relation_type})")
+    relation_table.run_method('scrollTo', len(relation_table.rows) - 1)
+
+    ui.notify(f"Added constraint: {name_1} - {name_2} ({relation_type})")
     
 def create_relations_file():
     os.makedirs("data", exist_ok=True)
