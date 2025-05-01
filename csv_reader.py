@@ -54,8 +54,10 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
 
         dictPersons[row.iloc[0]] = Person.Person(
         i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
-
-    return dictPersons
+        
+        # Sort by first_name attribute of each Person object
+    sorted_dict = dict(sorted(dictPersons.items(), key=lambda item: item[1].first_name.lower()))
+    return sorted_dict
 
 def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
     if file_path == None:

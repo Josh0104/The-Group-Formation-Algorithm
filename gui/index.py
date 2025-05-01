@@ -51,22 +51,22 @@ def dashboard() -> None:
         for p in person_dict.values():
             full_name = f"{p.first_name} {p.last_name}"
             option_select[p.uuid,full_name] =  [full_name] # rhs value and lhs label
-            
+                    
                       
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
                 ui.label("🫂 Must be on the same team").classes("font-semibold")
-                together_a = ui.select(options=option_select, label="Person A", with_input=True).classes('w-40')
-                together_b = ui.select(options=option_select, label="Person B", with_input=True).classes('w-40')
+                together_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
+                together_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
 
-                ui.button("Add", on_click=lambda: add_constraint(together_a.value, together_b.value, "together"))
+                ui.button("Add", on_click=lambda: add_constraint(together_a.value, together_b.value, "TOGETHER"))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
-                separate_a = ui.select(options=option_select, label="Person A", with_input=True).classes('w-40')
-                separate_b = ui.select(options=option_select, label="Person B", with_input=True).classes('w-40')
+                separate_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
+                separate_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
                 
-                ui.button("Add", on_click=lambda: add_constraint({separate_a.value, separate_b.value, "separate" }))
+                ui.button("Add", on_click=lambda: add_constraint(separate_a.value, separate_b.value, "SEPARATE"))
                 
         ui.button("Save and use relations", on_click=lambda: create_relations_file())
                 
@@ -104,14 +104,22 @@ def dashboard() -> None:
         with ui.expansion(f'Relation table').classes('w-1/2 justify-center') as relation_expansion:
 
             columns = [
-                      {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1'},
-                      {'name': 'name_2', 'label': 'Name 2', 'field': 'name_2'},
-                      {'name': 'relation', 'label': 'Relation', 'field': 'relation'},
+                      {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1', 'sortable': True, 'align': 'left'},
+                      {'name': 'name_2', 'label': 'Name 2', 'field': 'name_2', 'sortable': True, 'align': 'left'},
+                      {'name': 'relation', 'label': 'Relation', 'field': 'relation', 'sortable': True, 'align': 'left'},
                     #   {'name': 'weight', 'label': 'Weight', 'field': 'weight'},
                     #   {'name': 'description', 'label': 'Description', 'field': 'description'}
                       ]
             
             relation_table = ui.table(columns=columns, rows=[]).classes('h-52 items-center w-full').props('virtual-scroll')
+            
+            relation_table.add_slot('body-cell-relation', '''
+                        <q-td key="relation" :props="props">
+                            <q-badge :color="props.value == 'TOGETHER' ? 'blue' : 'orange'">
+                                {{ props.value }}
+                            </q-badge>
+                        </q-td>
+                    ''')
 
         # Upload button
         # ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
