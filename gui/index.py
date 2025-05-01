@@ -342,7 +342,6 @@ def add_constraint(a, b, relation_type):
     if not a or not b or a == b:
         ui.notify("Invalid selection", color="warning")
         return
-    
 
     relation_data.append({
         'uuid_1': a[0],
@@ -367,5 +366,3 @@ def create_relations_file():
             writer.writerow([row['uuid_1'], row['name_1'], row['uuid_2'], row['name_2'], row['relation'], row['weight'], row['description']])
 
     ui.notify("Saved the relation file")
-    
-
