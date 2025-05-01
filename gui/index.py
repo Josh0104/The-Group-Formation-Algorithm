@@ -33,9 +33,11 @@ loading = None
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 relation_data = []
+relation_table = None
 
 @ui.page('/')
 def dashboard() -> None:
+    global relation_table
     add_layout()
     global team_container, chart_container, format_setting_container
 
@@ -73,7 +75,7 @@ def dashboard() -> None:
         with dialog:
             with ui.card():
                 ui.label('Uploaded Relations File').classes('text-xl mb-2')
-                table = ui.table(
+                relation_table = ui.table(
                     columns=[
                         {'name': k, 'label': k.replace('_', ' ').title(), 'field': k}
                         for k in ['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description']
@@ -83,25 +85,37 @@ def dashboard() -> None:
                 ).classes('w-full')
 
         # Handle file upload
-        def handle_upload(e: events.UploadEventArguments):
-            content = e.content.read().decode('utf-8')
+        # def handle_upload(e: events.UploadEventArguments):
+        #     content = e.content.read().decode('utf-8')
 
-            # Auto detect delimiter (tab or comma)
-            delimiter = '\t' if '\t' in content else ','
+        #     # Auto detect delimiter (tab or comma)
+        #     delimiter = '\t' if '\t' in content else ','
 
-            reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-            rows = list(reader)
+        #     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
+        #     rows = list(reader)
 
-            if rows:
-                table.rows = rows
-                table.update()
-                dialog.open()
-            else:
-                ui.notify('No data found in CSV', color='negative')
+        #     if rows:
+        #         table.rows = rows
+        #         table.update()
+        #         dialog.open()
+        #     else:
+        #         ui.notify('No data found in CSV', color='negative')
+                
+        with ui.expansion(f'Relation table').classes('w-1/2 justify-center') as relation_expansion:
+
+            columns = [
+                      {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1'},
+                      {'name': 'name_2', 'label': 'Name 2', 'field': 'name_2'},
+                      {'name': 'relation', 'label': 'Relation', 'field': 'relation'},
+                    #   {'name': 'weight', 'label': 'Weight', 'field': 'weight'},
+                    #   {'name': 'description', 'label': 'Description', 'field': 'description'}
+                      ]
+            
+            relation_table = ui.table(columns=columns, rows=[]).classes('h-52 items-center w-full').props('virtual-scroll')
 
         # Upload button
-        ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
-        ui.upload(on_upload=handle_upload).props('accept=".csv"')
+        # ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
+        # ui.upload(on_upload=handle_upload).props('accept=".csv"')
 
         ui.row().classes("mt-4 gap-4")
         ui.button(
@@ -337,21 +351,35 @@ def label_roles(person : Person) -> str:
 relation_data = []
 
 def add_constraint(a, b, relation_type):
-    print(a, b)
+    global relation_data
     
     if not a or not b or a == b:
         ui.notify("Invalid selection", color="warning")
         return
+    
+    uuid_1 = a[0]
+    name_1 = a[1]
+    uuid_2 = b[0]
+    name_2 = b[1]
 
     relation_data.append({
-        'uuid_1': a[0],
-        'name_1': a[1],
-        'uuid_2': b[0],
-        'name_2': b[1],
+        'uuid_1': uuid_1,
+        'name_1': name_1,
+        'uuid_2': uuid_2,
+        'name_2': name_2,
         'relation': relation_type,
         'weight': 5,  # default weight or add a slider input
         'description': '',  # optional input
     })
+    relation_table.add_row({
+        'name_1': name_1,
+        'name_2': name_2,
+        'relation': relation_type,
+        # 'weight': 5,  # default weight or add a slider input
+        # 'description': '',  # optional input
+    })
+    relation_table.run_method('scrollTo', len(relation_table.rows)-1)
+    
     ui.notify(f"Added constraint: {a[1]} - {b[1]} ({relation_type})")
     
 def create_relations_file():
