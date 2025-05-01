@@ -362,7 +362,7 @@ def add_constraint(person_a, person_b, relation_type):
     global relation_data
 
     if not person_a or not person_b or person_a == person_b:
-        ui.notify("Invalid selection: can not add relation on same person", color="red")
+        ui.notify("Invalid selection: cannot add relation on the same person", color="red")
         return
 
     uuid_1, name_1 = person_a
@@ -370,12 +370,19 @@ def add_constraint(person_a, person_b, relation_type):
 
     # Check for existing symmetric relation
     for relation in relation_data:
+        u1, u2 = relation['uuid_1'], relation['uuid_2']
+        rel_type = relation['relation']
+
         if (
-            (relation['uuid_1'] == uuid_1 and relation['uuid_2'] == uuid_2) or
-            (relation['uuid_1'] == uuid_2 and relation['uuid_2'] == uuid_1)
+            (u1 == uuid_1 and u2 == uuid_2) or
+            (u1 == uuid_2 and u2 == uuid_1)
         ):
-            ui.notify("Invalid selection: relation already exists", color="red")
-            return
+            if rel_type == relation_type:
+                ui.notify("Invalid selection: relation already exists", color="red")
+                return
+            else:
+                ui.notify(f"Invalid conflict: {name_1} and {name_2} already have a '{rel_type}' relation", color="red")
+                return
 
     # Add new symmetric relation
     relation_data.append({
