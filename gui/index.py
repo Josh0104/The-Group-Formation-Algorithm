@@ -7,13 +7,12 @@ from person import Gender, AnswerOption
 import os
 import main as main
 from gui.layout import add_layout
-import csv, io
+import csv
 
 # Constants
 DATA_PATH = 'data/users.csv'
 
 # Global variables
-person_dict = cr.read_csv_pd(DATA_PATH)
 teams_data: list[tuple] = []
 team_stats = {}
 
@@ -40,6 +39,9 @@ def dashboard() -> None:
     global relation_table
     add_layout()
     global team_container, chart_container, format_setting_container
+    
+    from app_config import args  # access shared args
+    person_dict = cr.read_csv_pd(args.input)
 
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
@@ -50,8 +52,7 @@ def dashboard() -> None:
         option_select: dict = {}
         for p in person_dict.values():
             full_name = f"{p.first_name} {p.last_name}"
-            option_select[p.uuid,full_name] =  [full_name] # rhs value and lhs label
-                    
+            option_select[p.uuid,full_name, p.id] =  [full_name] # rhs value and lhs label
                       
         with ui.row().classes("mt-6 justify-center gap-10"):
             with ui.column().classes("items-center"):
@@ -111,7 +112,8 @@ def dashboard() -> None:
                     #   {'name': 'description', 'label': 'Description', 'field': 'description'}
                       ]
             
-            relation_table = ui.table(columns=columns, rows=[]).classes('h-52 items-center w-full').props('virtual-scroll')
+            relation_table = ui.table(columns=columns, rows=[],row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
+            ui.input('Search name').bind_value(relation_table, 'filter')
             
             relation_table.add_slot('body-cell-relation', '''
                         <q-td key="relation" :props="props">
@@ -120,6 +122,7 @@ def dashboard() -> None:
                             </q-badge>
                         </q-td>
                     ''')
+
 
         # Upload button
         # ui.label("Or choose a file").classes("text-sm text-yellow-200 mt-2")
@@ -155,17 +158,19 @@ async def run_optimizer():
     loading_container.classes(remove='hidden')
     
     try:
-        people = await run.io_bound(lambda: main.run_formation())
-        people_dicts = [p.to_dict() for p in people]
-        app.storage.user['latest_solution'] = people_dicts # Store the latest solution in app storage user
-
+        people = await run.io_bound(lambda: main.run_formation(relation_data))
         if people is None:
             ui.notify("No solution found", color="negative")
             return
+        
+        people_dicts = [p.to_dict() for p in people]
+        app.storage.user['latest_solution'] = people_dicts # Store the latest solution in app storage user
+
 
         raw_teams: dict[int, list[Person]] = {}
         for p in people:
             raw_teams.setdefault(p.team, []).append(p)
+        
 
         teams_data = sorted(raw_teams.items())
 
@@ -365,10 +370,10 @@ def add_constraint(person_a, person_b, relation_type):
         ui.notify("Invalid selection: cannot add relation on the same person", color="red")
         return
 
-    uuid_1, name_1 = person_a
-    uuid_2, name_2 = person_b
+    uuid_1, name_1, id_1 = person_a
+    uuid_2, name_2, id_2 = person_b
 
-    # Check for existing symmetric relation
+    # STEP 1: Check for direct duplicate or conflict
     for relation in relation_data:
         u1, u2 = relation['uuid_1'], relation['uuid_2']
         rel_type = relation['relation']
@@ -379,13 +384,48 @@ def add_constraint(person_a, person_b, relation_type):
         ):
             if rel_type == relation_type:
                 ui.notify("Invalid selection: relation already exists", color="red")
-                return
             else:
-                ui.notify(f"Invalid conflict: {name_1} and {name_2} already have a '{rel_type}' relation", color="red")
-                return
+                ui.notify(f"Invalid conflict: {name_1} and {name_2} already have a '{rel_type}' constraint", color="red")
+            return
 
-    # Add new symmetric relation
+    # STEP 2: Build TOGETHER graph
+    from collections import defaultdict, deque
+    graph = defaultdict(set)
+    for r in relation_data:
+        if r['relation'].upper() == 'TOGETHER':
+            graph[r['uuid_1']].add(r['uuid_2'])
+            graph[r['uuid_2']].add(r['uuid_1'])
+
+    # STEP 3: Transitivity logic
+    def is_transitively_connected(start, target):
+        visited = set()
+        queue = deque([start])
+        while queue:
+            current = queue.popleft()
+            if current == target:
+                return True
+            for neighbor in graph[current]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+        return False
+
+    # 3a: Prevent redundant transitive TOGETHER
+    if relation_type.upper() == 'TOGETHER':
+        if is_transitively_connected(uuid_1, uuid_2):
+            ui.notify(f"Invalid transitive relation: {name_1} is already connected to {name_2} via other people", color="red")
+            return
+
+    # 3b: Prevent SEPARATE between people already transitively together
+    if relation_type.upper() == 'SEPARATE':
+        if is_transitively_connected(uuid_1, uuid_2):
+            ui.notify(f"Invalid logic: cannot separate {name_1} and {name_2} — they are already transitively connected by TOGETHER constraints", color="red")
+            return
+    
+    # STEP 4: Add new valid relation
     relation_data.append({
+        'id_1': id_1,
+        'id_2': id_2,
         'uuid_1': uuid_1,
         'name_1': name_1,
         'uuid_2': uuid_2,
@@ -403,6 +443,12 @@ def add_constraint(person_a, person_b, relation_type):
     relation_table.run_method('scrollTo', len(relation_table.rows) - 1)
 
     ui.notify(f"Added constraint: {name_1} - {name_2} ({relation_type})")
+    
+    # Relation logic:
+    # A == B - ❌ Invalid (same person)
+    # A ↔ B already exists - ❌ Duplicate or conflict
+    # A–B–C exists and A–C added (TOGETHER) - ❌ Redundant via transitivity
+    # A->B & B–>C exists and A–C added (SEPARATE) - ❌ Conflict (can’t separate A–C)
     
 def create_relations_file():
     os.makedirs("data", exist_ok=True)

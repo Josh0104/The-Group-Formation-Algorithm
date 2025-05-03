@@ -42,9 +42,9 @@ def args_parser():
     return args
 
 
-def run_formation():
+def run_formation(relations_data):
     from app_config import args  # access shared args
-
+    print("relations_data", relations_data)
     try:
         dict_uuid_person = cr.read_csv_pd(args.input)
     except FileNotFoundError as fnfe:
@@ -60,7 +60,8 @@ def run_formation():
         args.print,
         args.output,
         args.no_output,
-        args.verbose
+        args.verbose,
+        relations_data
     )
 
 
@@ -68,7 +69,7 @@ def main():
     args = args_parser()
 
     if args.no_gui:
-        run_formation(args)
+        run_formation([])
     else:
         gui.run_gui()
 
