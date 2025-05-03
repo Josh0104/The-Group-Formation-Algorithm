@@ -1,6 +1,7 @@
 from datetime import datetime
 from nicegui import ui, run, app, events
 import csv_reader as cr
+import io
 import formation as fm
 from formation import Person
 from person import Gender, AnswerOption
@@ -42,6 +43,7 @@ def dashboard() -> None:
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
+    
 
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
@@ -60,68 +62,70 @@ def dashboard() -> None:
                 together_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
                 together_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
 
-                ui.button("Add", on_click=lambda: add_constraint(together_a.value, together_b.value, "TOGETHER"))
+                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_expansion.set_visibility(True), add_constraint(together_a.value, together_b.value, "TOGETHER")))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
                 separate_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
                 separate_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
                 
-                ui.button("Add", on_click=lambda: add_constraint(separate_a.value, separate_b.value, "SEPARATE"))
+                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_expansion.set_visibility(True),add_constraint(separate_a.value, separate_b.value, "SEPARATE")))
                 
         ui.button("Save and use relations", on_click=lambda: create_relations_file())
+        
+        columns = [
+            {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1', 'sortable': True, 'align': 'left'},
+            {'name': 'name_2', 'label': 'Name 2', 'field': 'name_2', 'sortable': True, 'align': 'left'},
+            {'name': 'relation', 'label': 'Relation', 'field': 'relation', 'sortable': True, 'align': 'left'},
+        #   {'name': 'weight', 'label': 'Weight', 'field': 'weight'},
+        #   {'name': 'description', 'label': 'Description', 'field': 'description'}
+            ]
+        
+        def handle_upload(e):
+            content = e.content.read().decode('utf-8')
+
+            # Auto detect delimiter (tab or comma)
+            delimiter = '\t' if '\t' in content else ','
+
+            reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
+            rows = list(reader)
+            print(rows)
+
+            if rows:
+                # relation_table_dialog.rows = rows
+                # relation_table_dialog.update()
+                dialog.open()
+                relation_card.move(uploaded_card)
                 
+            else:
+                ui.notify('No data found in CSV', color='negative')
+        
+        upload_card = ui.upload(
+            label="Upload relations file",
+            on_upload=lambda e: handle_upload(e),
+        )
+
         # Create empty dialog and table first
         dialog = ui.dialog()
         with dialog:
-            with ui.card():
+            with ui.card() as uploaded_card:
                 ui.label('Uploaded Relations File').classes('text-xl mb-2')
-                relation_table = ui.table(
-                    columns=[
-                        {'name': k, 'label': k.replace('_', ' ').title(), 'field': k}
-                        for k in ['uuid_1', 'name_1', 'uuid_2', 'name_2', 'relation', 'weight', 'description']
-                    ],
-                    rows=[],
-                    row_key='uuid_1',
-                ).classes('w-full')
-
-        # Handle file upload
-        # def handle_upload(e: events.UploadEventArguments):
-        #     content = e.content.read().decode('utf-8')
-
-        #     # Auto detect delimiter (tab or comma)
-        #     delimiter = '\t' if '\t' in content else ','
-
-        #     reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
-        #     rows = list(reader)
-
-        #     if rows:
-        #         table.rows = rows
-        #         table.update()
-        #         dialog.open()
-        #     else:
-        #         ui.notify('No data found in CSV', color='negative')
-                
+                # relation_table_dialog = ui.table(columns=columns, rows=[], row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
+            
         with ui.expansion(f'Relation table').classes('w-1/2 justify-center') as relation_expansion:
+            with ui.card().classes('w-full') as relation_card:
+                relation_table = ui.table(columns=columns, rows=[],row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
+                ui.input('Search name').bind_value(relation_table, 'filter')
+                
+                relation_table.add_slot('body-cell-relation', '''
+                            <q-td key="relation" :props="props">
+                                <q-badge :color="props.value == 'TOGETHER' ? 'blue' : 'orange'">
+                                    {{ props.value }}
+                                </q-badge>
+                            </q-td>
+                        ''')
 
-            columns = [
-                      {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1', 'sortable': True, 'align': 'left'},
-                      {'name': 'name_2', 'label': 'Name 2', 'field': 'name_2', 'sortable': True, 'align': 'left'},
-                      {'name': 'relation', 'label': 'Relation', 'field': 'relation', 'sortable': True, 'align': 'left'},
-                    #   {'name': 'weight', 'label': 'Weight', 'field': 'weight'},
-                    #   {'name': 'description', 'label': 'Description', 'field': 'description'}
-                      ]
-            
-            relation_table = ui.table(columns=columns, rows=[],row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
-            ui.input('Search name').bind_value(relation_table, 'filter')
-            
-            relation_table.add_slot('body-cell-relation', '''
-                        <q-td key="relation" :props="props">
-                            <q-badge :color="props.value == 'TOGETHER' ? 'blue' : 'orange'">
-                                {{ props.value }}
-                            </q-badge>
-                        </q-td>
-                    ''')
+        relation_expansion.set_visibility(False)
 
 
         # Upload button
