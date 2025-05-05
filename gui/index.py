@@ -62,14 +62,14 @@ def dashboard() -> None:
                 together_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
                 together_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
 
-                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_expansion.set_visibility(True), add_constraint(together_a.value, together_b.value, "TOGETHER")))
+                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_card.set_visibility(True), add_constraint(together_a.value, together_b.value, "TOGETHER")))
 
             with ui.column().classes("items-center"):
                 ui.label("🚫 Must be on different teams").classes("font-semibold")
                 separate_a = ui.select(options=option_select, label="Person A", with_input=True, clearable=True).classes('w-40')
                 separate_b = ui.select(options=option_select, label="Person B", with_input=True, clearable=True).classes('w-40')
                 
-                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_expansion.set_visibility(True),add_constraint(separate_a.value, separate_b.value, "SEPARATE")))
+                ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_card.set_visibility(True),add_constraint(separate_a.value, separate_b.value, "SEPARATE")))
                 
         ui.button("Save and use relations", on_click=lambda: create_relations_file())
         
@@ -89,31 +89,53 @@ def dashboard() -> None:
 
             reader = csv.DictReader(io.StringIO(content), delimiter=delimiter)
             rows = list(reader)
-            print(rows)
-
+            
             if rows:
-                # relation_table_dialog.rows = rows
-                # relation_table_dialog.update()
-                dialog.open()
-                relation_card.move(uploaded_card)
+                relation_data.clear()
+                for r in rows:
+                    try: 
+                        person_1 = person_dict.get(r['uuid_1'])
+                        person_2 = person_dict.get(r['uuid_2'])
+                        id_1 = person_1.id
+                        id_2 = person_2.id
+
+                        relation_data.append({
+                            'id_1': id_1,
+                            'id_2': id_2,
+                            'uuid_1': r['uuid_1'],
+                            'name_1': r['name_1'],
+                            'uuid_2': r['uuid_2'],
+                            'name_2': r['name_2'],
+                            'relation': r['relation'],
+                            'weight': r['weight'],
+                            'description': r['description']
+                        })
+                        
+                    except KeyError as e:
+                        ui.notify(f"Invalid file there is an uuid that does not exist in the people table", color='negative')
+                        upload_card.reset()
+                        return
+
+                relation_table.update_rows(rows)
+                relation_card.set_visibility(True)                
                 
             else:
-                ui.notify('No data found in CSV', color='negative')
+                ui.notify('Error in reading csv file', color='negative')
+                upload_card.reset()
+
         
         upload_card = ui.upload(
             label="Upload relations file",
             on_upload=lambda e: handle_upload(e),
-        )
-
-        # Create empty dialog and table first
-        dialog = ui.dialog()
-        with dialog:
-            with ui.card() as uploaded_card:
-                ui.label('Uploaded Relations File').classes('text-xl mb-2')
-                # relation_table_dialog = ui.table(columns=columns, rows=[], row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
+            multiple=False,
+            auto_upload=True,
+            max_file_size=1 * 1024 * 1024, # 1 Mb
+            max_files=1,
+            on_rejected=lambda e: ui.notify(f"File rejected: only allow .csv with max size of 1 Mb", color='negative'),
+        ).props('accept=.csv,txt') 
             
-        with ui.expansion(f'Relation table').classes('w-1/2 justify-center') as relation_expansion:
-            with ui.card().classes('w-full') as relation_card:
+        # with ui.expansion(f'Relation table').classes('w-1/2 justify-center') as relation_expansion:
+        with ui.card().classes('w-1/2') as relation_card:
                 relation_table = ui.table(columns=columns, rows=[],row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
                 ui.input('Search name').bind_value(relation_table, 'filter')
                 
@@ -125,7 +147,7 @@ def dashboard() -> None:
                             </q-td>
                         ''')
 
-        relation_expansion.set_visibility(False)
+        relation_card.set_visibility(False)
 
 
         # Upload button
@@ -183,7 +205,7 @@ async def run_optimizer():
             team_stats[team] = stats
 
         update_team_ui()
-    
+            
     except Exception as e:
         ui.notify(f"Error running optimizer: {e}", color="negative")
         print(f"Error: {e}")
@@ -209,6 +231,7 @@ def update_team_ui():
     format_setting_container.classes(remove='hidden')
     team_container.classes(remove='hidden')
     chart_container.classes(remove='hidden')
+    team_cards.classes(remove='hidden')
 
     format_setting_container.clear()
     team_container.clear()
