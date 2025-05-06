@@ -120,9 +120,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
                 relations_together.append((id_1, id_2))
             elif relation_type == 'SEPARATE':
                 relations_separate.append((id_1, id_2))
-        
-        print("people", people)
-                
+                        
         for (p, q) in relations_separate:
             for t in teams:
                 m += x[p][t] + x[q][t] <= 1

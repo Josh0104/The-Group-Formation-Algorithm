@@ -14,6 +14,8 @@
 # ignoire .nicegui folder that holds storages 
 /.nicegui/
 
+#ignore the solutions file
+/solutions
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
