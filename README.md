@@ -32,15 +32,15 @@ python3 main.py --input <path/to/file>
 
 ### Command-line Arguments
 
-| Argument         | Alternative       | Value Format          | Required | Default Value  | Description                                                  |
-|------------------|-------------------|-----------------------|--------------------------------------|----------|----------------------------------------|
-| `-i`             | `--input`         | `path/to/input.csv`   | Yes      | -              | File input to read                                           |
-| `-g`             | `--group`         | `int`                 | No       | `5`            | Number of groups to form                                   |
-| `-p`             | `--print`         | `flag`                | No       | `False`        | Print the output to console                                  |
-| `-o`             | `--output`        | `path/to/output.csv`  | No       | `./output`     | Path for output file                                         |
-| `-n`             | `--no-output`     | `flag`                | No       | `False`        | Do not generate an output file                               |
-| `-v`             | `--verbose`       | `flag`                | No       | `False`        | Generate gurobi solution to console                          |
-| `--no-gui`       |   -               | `flag`                | No       | `False`        | Prevent the program to create a graphical user interface     |
+| Argument         | Alternative       | Value Format          | Default Value            | Description                                                  |
+|------------------|-------------------|-----------------------|--------------------------|--------------------------------------------------------------|
+| `-i`             | `--input`         | `path/to/input.csv`   | `data/people/people.csv` | File input to read                                           |
+| `-g`             | `--group`         | `int`                 | `5`                      | Number of groups to form                                     |
+| `-p`             | `--print`         | `flag`                | `False`                  | Print the output to console                                  |
+| `-o`             | `--output`        | `path/to/output.csv`  | `./output`               | Path for output file                                         |
+| `-n`             | `--no-output`     | `flag`                | `False`                  | Do not generate an output file                                |
+| `-v`             | `--verbose`       | `flag`                | `False`                  | Generate gurobi solution to console                          |
+| `--no-gui`       |   -               | `flag`                | `False`                  | Prevent the program to create a graphical user interface     |
 
 
 
