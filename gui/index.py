@@ -39,7 +39,7 @@ relation_table = None
 def dashboard() -> None:
     global relation_table
     add_layout()
-    global team_container, chart_container, format_setting_container
+    global team_container, chart_container, format_setting_container, separator_line
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
@@ -158,6 +158,7 @@ def dashboard() -> None:
         ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
     
          #These start hidden
+        separator_line = ui.separator().classes("hidden")
         format_setting_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         chart_container = ui.row().classes("w-full justify-center hidden")
@@ -222,6 +223,7 @@ def save_solution():
 # Update team + chart UI
 def update_team_ui():
     global team_container, chart_container
+    separator_line.classes(remove='hidden')
     format_setting_container.classes(remove='hidden')
     team_container.classes(remove='hidden')
     chart_container.classes(remove='hidden')
