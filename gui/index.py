@@ -13,15 +13,6 @@ import csv
 # Global variables
 teams_data: list[tuple] = []
 team_stats = {}
-
-# Constraint tracking
-same_team_constraints = []
-diff_team_constraints = []
-
-same_a = None
-diff_a = None  
-same_b = None
-diff_b = None
 team_cards = []
 loading_container = None
 loading = None
