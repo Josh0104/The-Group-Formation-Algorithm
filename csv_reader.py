@@ -2,16 +2,14 @@ import pandas as pd
 # Hello
 import csv_schema as schema
 import person as Person
+import app_config
 
-default_file_path = 'data/users.csv'
+
 dictPersons = {}
 
 def read_csv_pd(file_path) -> dict[str, Person.Person]:
-    # if file_path == None:
-    #     file_path = default_file_path
     
     df = pd.read_csv(file_path)
-
     
     result = df[[
         schema.columns["uuid"], # 0
@@ -31,7 +29,6 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         schema.columns["q9"], # 14
         schema.columns["q10"], # 15
         ]]
-
 
     for i, row  in result.iterrows():
 
@@ -55,9 +52,10 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
         dictPersons[row.iloc[0]] = Person.Person(
         i, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
         
+    return dictPersons
         # Sort by first_name attribute of each Person object
-    sorted_dict = dict(sorted(dictPersons.items(), key=lambda item: item[1].first_name.lower()))
-    return sorted_dict
+    # sorted_dict = dict(sorted(dictPersons.items(), key=lambda item: item[1].first_name.lower()))
+    # return sorted_dict 
 
 def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
     if file_path == None:

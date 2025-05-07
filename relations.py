@@ -10,7 +10,7 @@ def get_relations(people: dict[str, Person], path) -> list:
     if path is None or path == "" :
         path = 'relations.csv'
         
-    file_path = os.path.join(os.path.dirname(__file__), 'data/', path)
+    file_path = os.path.join(os.path.dirname(__file__), 'data/relations', path)
     relations = {}
     
     with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:

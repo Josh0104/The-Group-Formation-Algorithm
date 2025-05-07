@@ -21,7 +21,7 @@ def args_parser():
 
     # Validation
     if args.input is None:
-        args.input = "data/users.csv"
+        args.input = "data/people/people.csv"
         # raise TypeError(
         #     '❌ Please specify a file input with -i or --input\n'
         #     'Example usage: python3 main.py -i <path/to/file>'

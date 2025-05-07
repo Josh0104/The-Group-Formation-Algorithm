@@ -102,34 +102,30 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     ) for t in teams)
     
     
-    def set_relations(m): 
-        relations = []
-        if relations_data is None:
-            relations = Relations.get_relations(people,None)
-        else:
-            relations = relations_data
-        relations_together: list[tuple] = []
-        relations_separate: list[tuple] = []
+    if relations_data is None:
+        print("No relations data provided.")
+        relations_data = Relations.get_relations(people,None)
+
+    relations_together: list[tuple] = []
+    relations_separate: list[tuple] = []
+    
+    for r in relations_data:
+        id_1 = r['id_1']
+        id_2 = r['id_2']
+        relation_type = r['relation']
         
-        for r in relations:
-            id_1 = r['id_1']
-            id_2 = r['id_2']
-            relation_type = r['relation']
+        if relation_type == 'TOGETHER':
+            relations_together.append((id_1, id_2))
+        elif relation_type == 'SEPARATE':
+            relations_separate.append((id_1, id_2))
             
-            if relation_type == 'TOGETHER':
-                relations_together.append((id_1, id_2))
-            elif relation_type == 'SEPARATE':
-                relations_separate.append((id_1, id_2))
-                        
-        for (p, q) in relations_separate:
-            for t in teams:
-                m += x[p][t] + x[q][t] <= 1
-                
-        for (p, q) in relations_together:
-            for t in teams:
-                    m += x[p][t] - x[q][t] == 0
-                
-    set_relations(m)
+    for (p, q) in relations_together:
+        for t in teams:
+                m += x[p][t] - x[q][t] == 0
+                    
+    for (p, q) in relations_separate:
+        for t in teams:
+            m += x[p][t] + x[q][t] <= 1
 
     m.optimize()
 

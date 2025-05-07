@@ -32,9 +32,6 @@ loading = None
 # UI elements
 loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
-relation_data = []
-relation_table = None
-
 @ui.page('/')
 def dashboard() -> None:
     global relation_table
@@ -43,14 +40,13 @@ def dashboard() -> None:
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
-    
 
     # --- Layout --- 
     with ui.column().classes("items-center w-full"):
         
         ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
 
-        with ui.expansion("Relations").classes("w-1/2 mt-4 justify-center") as relation_expansion:
+        with ui.expansion("Relations").classes("w-7xl mt-4 justify-center") as relation_expansion:
 
             option_select: dict = {}
             for p in person_dict.values():
@@ -74,7 +70,7 @@ def dashboard() -> None:
                         ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_card.set_visibility(True),add_constraint(separate_a.value, separate_b.value, "SEPARATE")))
                     
             with ui.column().classes("items-center w-full"):
-                ui.button("Save and use relations", on_click=lambda: create_relations_file()).classes("item-center")
+                ui.button("Save relations to file", on_click=lambda: create_relations_file()).classes("item-center")
                 
                 columns = [
                     {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1', 'sortable': True, 'align': 'left'},
@@ -137,7 +133,7 @@ def dashboard() -> None:
                     on_rejected=lambda e: ui.notify(f"File rejected: only allow .csv with max size of 1 Mb", color='negative'),
                 ).props('accept=.csv,txt') 
                     
-                with ui.card().classes('w-1/2') as relation_card:
+                with ui.card().classes('w-full') as relation_card:
                         relation_table = ui.table(columns=columns, rows=[],row_key='name',).classes('h-52 items-center w-full').props('virtual-scroll')
                         ui.input('Search name').bind_value(relation_table, 'filter')
                         
@@ -148,8 +144,9 @@ def dashboard() -> None:
                                         </q-badge>
                                     </q-td>
                                 ''')
-
+                ui.button("Clear all relations", color="orange",on_click=lambda: (clear_relations(relation_card))).classes("bg-red-600 text-white")
             relation_card.set_visibility(False)
+            
 
         ui.button(
             "RUN ALGORITHM",
@@ -170,7 +167,21 @@ def compute_stats(team_members: list[Person]) -> dict:
     leaders = sum(1 for p in team_members if "yes" in p.a1)
     skill_total = sum(p.a4.value for p in team_members if p.a4 is not None)
     total_musicians = sum(1 for p in team_members if p.a5 == AnswerOption.YES)
-    return {'total': total, 'leaders': leaders, 'skill': skill_total, 'musicians': total_musicians}
+    total_male = sum(1 for p in team_members if p.gender == Gender.MALE and p.get_age() > 24)
+    total_female = sum(1 for p in team_members if p.gender == Gender.FEMALE and p.get_age() > 24)
+    total_youth = sum(1 for p in team_members if 13 <= p.get_age() <= 24)
+    total_kids = sum(1 for p in team_members if 5 <= p.get_age() <= 12)
+    total_babies = sum(1 for p in team_members if p.get_age() < 5)
+    return {'total': total, 
+            'leaders': leaders, 
+            'skill': skill_total, 
+            'musicians': total_musicians, 
+            'male': total_male,
+            'female': total_female,
+            'youth': total_youth,
+            'kids': total_kids,
+            'babies': total_babies
+            }
 
 # Run optimizer
 async def run_optimizer():
@@ -178,6 +189,7 @@ async def run_optimizer():
     loading_container.classes(remove='hidden')
     
     try:
+        print("relation_data", relation_data)
         people = await run.io_bound(lambda: main.run_formation(relation_data))
         if people is None:
             ui.notify("No solution found", color="negative")
@@ -250,7 +262,7 @@ def update_team_ui():
         for team, members in teams_data:
             with team_container:
                 stat = team_stats[team]
-                with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
+                with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Male: {stat["male"]} | Female: {stat["female"]} | Youth: {stat["youth"]} | Kids: {stat["kids"]} | Babies: {stat["babies"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
                     with ui.column().classes("pl-4"):
                         # Categorize by age + gender
                         def sort_alpha():
@@ -386,7 +398,7 @@ def label_roles(person : Person) -> str:
 relation_data = []
 
 def add_constraint(person_a, person_b, relation_type):
-    global relation_data
+    global relation_data, relation_table
 
     if not person_a or not person_b or person_a == person_b:
         ui.notify("Invalid selection: cannot add relation on the same person", color="red")
@@ -453,7 +465,7 @@ def add_constraint(person_a, person_b, relation_type):
         'uuid_2': uuid_2,
         'name_2': name_2,
         'relation': relation_type,
-        'weight': 5,
+        'weight': 1,
         'description': '',
     })
 
@@ -475,7 +487,7 @@ def add_constraint(person_a, person_b, relation_type):
 def create_relations_file():
     os.makedirs("data", exist_ok=True)
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    path = os.path.join("data", f"relations_{timestamp}.csv")
+    path = os.path.join("data/relations", f"relations_{timestamp}.csv")
 
     with open(path, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
@@ -484,3 +496,10 @@ def create_relations_file():
             writer.writerow([row['uuid_1'], row['name_1'], row['uuid_2'], row['name_2'], row['relation'], row['weight'], row['description']])
 
     ui.notify("Saved the relation file")
+    
+def clear_relations(relation_card):
+    global relation_data, relation_table
+    relation_data.clear()
+    relation_table.rows.clear()
+    relation_card.set_visibility(False)
+    ui.notify("Cleared all relations")
