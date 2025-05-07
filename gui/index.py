@@ -10,9 +10,6 @@ import main as main
 from gui.layout import add_layout
 import csv
 
-# Constants
-DATA_PATH = 'data/users.csv'
-
 # Global variables
 teams_data: list[tuple] = []
 team_stats = {}
