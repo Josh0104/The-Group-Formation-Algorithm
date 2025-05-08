@@ -58,7 +58,6 @@ def dashboard() -> None:
                         ui.button("Add", on_click=lambda: (upload_card.set_visibility(False),relation_card.set_visibility(True),add_constraint(separate_a.value, separate_b.value, "SEPARATE")))
                     
             with ui.column().classes("items-center w-full"):
-                ui.button("Save relations to file", on_click=lambda: create_relations_file()).classes("item-center")
                 
                 columns = [
                     {'name': 'name_1', 'label': 'Name 1', 'field': 'name_1', 'sortable': True, 'align': 'left'},
@@ -133,6 +132,8 @@ def dashboard() -> None:
                                     </q-td>
                                 ''')
                 ui.button("Clear all relations", color="orange",on_click=lambda: (clear_relations(relation_card))).classes("bg-red-600 text-white")
+                ui.button("Save relations as file", on_click=lambda: create_relations_file()).classes("item-center")
+
             relation_card.set_visibility(False)
             
 
@@ -327,7 +328,7 @@ def update_team_ui():
     # Scroll down to the results
     ui.run_javascript('''
     let start = window.scrollY;
-    let end = 450; // document.body.scrollHeight;// Adjust this value to the desired scroll position
+    let end = document.body.scrollHeight - 800; // document.body.scrollHeight;// Adjust this value to the desired scroll position
     let distance = end - start;
     let duration = 1500; // duration in ms
     let startTime = performance.now();
