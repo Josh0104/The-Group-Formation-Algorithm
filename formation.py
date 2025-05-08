@@ -11,7 +11,7 @@ from person import Person
 # Global variable to store last model for saving
 last_model = None
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose): 
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data): 
     global last_model
 
     # Load data
@@ -84,7 +84,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
+        # m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
         m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
         m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
 
@@ -101,57 +101,31 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         1.0 * prop_imbalance[t]
     ) for t in teams)
     
-    relations = Relations.get_relations(people)
     
+    if relations_data is None:
+        print("No relations data provided.")
+        relations_data = Relations.get_relations(people,None)
+
     relations_together: list[tuple] = []
     relations_separate: list[tuple] = []
-    for r in relations.values():
+    
+    for r in relations_data:
         id_1 = r['id_1']
         id_2 = r['id_2']
-        relation = r['relation']
-        name_1 = r['name_1']
-        name_2 = r['name_2']
-        print(f"Relation: {r['relation']}, {id_1}, {id_2} {name_1}, {name_2}, {r['relation']}") if args_verbose else None
+        relation_type = r['relation']
         
-        if relation == 'TOGETHER':
+        if relation_type == 'TOGETHER':
             relations_together.append((id_1, id_2))
-        elif relation == 'SEPARATE':
+        elif relation_type == 'SEPARATE':
             relations_separate.append((id_1, id_2))
             
-    for (p, q) in relations_separate:
-        for t in teams:
-            m += x[p][t] + x[q][t] <= 1
-
     for (p, q) in relations_together:
         for t in teams:
                 m += x[p][t] - x[q][t] == 0
-                
-        # uuid_1 = r['uuid_1']
-        # uuid_2 = r['uuid_2']
-        # relation = r['relation']
-        # weight = r['weight']
-        # description = r['description']
-
-        # if relation == "TOGETHER":
-        #     v = m.add_var(var_type=BINARY)
-        #     for t in teams:
-        #         m += x[name_to_index[uuid_1]][t] - x[name_to_index[uuid_2]][t] <= v
-        #         m += x[name_to_index[uuid_2]][t] - x[name_to_index[uuid_1]][t] <= v
-        #     m.objective += 5 * v
-        #     q9_violations.append(v)
-
-        # elif relation == "SEPARATE":
-        #     v = m.add_var(var_type=BINARY)
-        #     for t in teams:
-        #         m += x[name_to_index[uuid_1]][t] + x[name_to_index[uuid_2]][t] <= 1 + v
-        #     m.objective += 10 * v
-        #     q10_violations.append(v)
-
-    # Static data
-    # Constraint: prevent certain campers from being in the same team
-    
-    # not_together = [(7,8), (7,2)]
-    
+                    
+    for (p, q) in relations_separate:
+        for t in teams:
+            m += x[p][t] + x[q][t] <= 1
 
     m.optimize()
 
@@ -159,7 +133,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     last_model = m
 
     if m.status == OptimizationStatus.OPTIMAL:
-
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
         timestamp = int(time.time())

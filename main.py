@@ -21,7 +21,7 @@ def args_parser():
 
     # Validation
     if args.input is None:
-        args.input = "data/users.csv"
+        args.input = "data/people/people.csv"
         # raise TypeError(
         #     '❌ Please specify a file input with -i or --input\n'
         #     'Example usage: python3 main.py -i <path/to/file>'
@@ -42,9 +42,9 @@ def args_parser():
     return args
 
 
-def run_formation():
+def run_formation(relations_data):
     from app_config import args  # access shared args
-
+    print("relations_data", relations_data)
     try:
         dict_uuid_person = cr.read_csv_pd(args.input)
     except FileNotFoundError as fnfe:
@@ -60,7 +60,8 @@ def run_formation():
         args.print,
         args.output,
         args.no_output,
-        args.verbose
+        args.verbose,
+        relations_data
     )
 
 
@@ -68,7 +69,7 @@ def main():
     args = args_parser()
 
     if args.no_gui:
-        run_formation(args)
+        run_formation([])
     else:
         gui.run_gui()
 
