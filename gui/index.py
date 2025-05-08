@@ -34,7 +34,7 @@ def dashboard() -> None:
         
         ui.label("Team Optimizer Dashboard").classes("text-3xl font-bold mt-4")
 
-        with ui.expansion("Relations").classes("w-7xl mt-4 justify-center") as relation_expansion:
+        with ui.expansion("Relations").classes("w-7xl mt-4 justify-center dark:bg-gray-700 bg-gray-100 "):
 
             option_select: dict = {}
             for p in person_dict.values():
