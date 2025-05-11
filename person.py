@@ -12,7 +12,7 @@ class Person :
         self.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
         self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
-        self.a1 = a1.lower() if a1 else ""
+        self.a1 = AnswerOption.translate_a1(a1) if a1 else None
         self.a2 = AnswerOption.from_str(a2) if a2 else None
         self.a3 = AnswerOption.from_str(a3) if a3 else None
         self.a4 = AnswerOption.from_str(a4) if a4 else None
@@ -96,6 +96,15 @@ class AnswerOption(Enum):
         if value.lower() == "yes":
             return AnswerOption.YES
         elif value.lower() == "maybe":
+            return AnswerOption.MAYBE
+        else:
+            return AnswerOption.NO
+        
+    @staticmethod
+    def translate_a1(answer) -> 'AnswerOption':
+        if  'Yes' in answer:
+            return AnswerOption.YES
+        elif "co-lead" in answer: 
             return AnswerOption.MAYBE
         else:
             return AnswerOption.NO

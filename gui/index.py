@@ -153,7 +153,7 @@ def dashboard() -> None:
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
     total = len(team_members)
-    leaders = sum(1 for p in team_members if "yes" in p.a1)
+    leadership = sum(1 for p in team_members if AnswerOption.YES == p.a1)
     skill_total = sum(p.a4.value for p in team_members if p.a4 is not None)
     total_musicians = sum(1 for p in team_members if p.a5 == AnswerOption.YES)
     total_male = sum(1 for p in team_members if p.gender == Gender.MALE and p.get_age() > 24)
@@ -162,7 +162,7 @@ def compute_stats(team_members: list[Person]) -> dict:
     total_kids = sum(1 for p in team_members if 5 <= p.get_age() <= 12)
     total_babies = sum(1 for p in team_members if p.get_age() < 5)
     return {'total': total, 
-            'leaders': leaders, 
+            'leaders': leadership, 
             'skill': skill_total, 
             'musicians': total_musicians, 
             'male': total_male,
@@ -178,7 +178,6 @@ async def run_optimizer():
     loading_container.classes(remove='hidden')
     
     try:
-        print("relation_data", relation_data)
         people = await run.io_bound(lambda: main.run_formation(relation_data))
         if people is None:
             ui.notify("No solution found", color="negative")
@@ -352,7 +351,7 @@ def update_team_ui():
 
 def label_roles(person : Person) -> str:
     roles = []
-    if "yes" in person.a1:
+    if person.a1 == AnswerOption.YES:
         roles.append("👑") 
     elif person.a1 == AnswerOption.MAYBE:
         roles.append("(👑)")

@@ -17,19 +17,11 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     # Load data
     campers = list(people.values())
     num_teams = number_of_groups
-
-    def is_team_leader(answer):
-        # if "yes" in answer.lower() : 
-        #     return 3
-        # elif "co-lead" in answer.lower() :
-        #     return 1
-        # else :
-        #     return 0
-        return 1 if "yes" in answer.lower() else 0
     
 
+    # Extract attributes from campers
+    leadership = [p.a1.value for p in campers]
     skill_levels = [p.a4.value for p in campers]
-    is_leader = [is_team_leader(p.a1) for p in campers]
     creativity = [p.a2.value for p in campers]
     bible_knowledge = [p.a3.value for p in campers]
     musical_ability = [p.a5.value for p in campers]
@@ -41,6 +33,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     teams = range(num_teams)
     camper_ids = range(num_campers)
 
+    avg_leadership = sum(leadership) / num_teams
     avg_skill = sum(skill_levels) / num_teams
     avg_creativity = sum(creativity) / num_teams
     avg_bible = sum(bible_knowledge) / num_teams
@@ -54,10 +47,13 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     m.max_seconds = 120 # Set a time limit of 120 seconds
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
 
+    # Every camper is assigned to one and only one team.
     for c in camper_ids:
         m += xsum(x[c][t] for t in teams) == 1
 
+    # Define Team Imbalance Variables
     imbalance = [m.add_var() for _ in teams]
+    leadership_imbalance = [m.add_var() for _ in teams]
     creativity_imbalance = [m.add_var() for _ in teams]
     bible_imbalance = [m.add_var() for _ in teams]
     music_imbalance = [m.add_var() for _ in teams]
@@ -69,9 +65,13 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     min_team_size = int(avg_team_size - plus_minus) # Minimum team size (±)
     max_team_size = int(avg_team_size + plus_minus) # Maximum team size (±)
 
+    # Balance constraints per skill
+    # imbalance ≥ absolute difference between actual skill in team and average skill.
     for t in teams:
         m += imbalance[t] >= xsum(skill_levels[c] * x[c][t] for c in camper_ids) - avg_skill
         m += imbalance[t] >= avg_skill - xsum(skill_levels[c] * x[c][t] for c in camper_ids)
+        m += leadership_imbalance[t] >= xsum(leadership[c] * x[c][t] for c in camper_ids) - avg_leadership
+        m += leadership_imbalance[t] >= avg_leadership - xsum(leadership[c] * x[c][t] for c in camper_ids)
         m += creativity_imbalance[t] >= xsum(creativity[c] * x[c][t] for c in camper_ids) - avg_creativity
         m += creativity_imbalance[t] >= avg_creativity - xsum(creativity[c] * x[c][t] for c in camper_ids)
         m += bible_imbalance[t] >= xsum(bible_knowledge[c] * x[c][t] for c in camper_ids) - avg_bible
@@ -84,7 +84,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
-        # m += xsum(is_leader[c] * x[c][t] for c in camper_ids) >= 1
         m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
         m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
 
@@ -101,7 +100,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         1.0 * prop_imbalance[t]
     ) for t in teams)
     
-    
+    # Add relations constraints
     if relations_data is None:
         print("No relations data provided.")
         relations_data = Relations.get_relations(people,None)
@@ -142,7 +141,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             for c in camper_ids:
                 if x[c][t].x >= 0.99:
                     camper = campers[c]
-                    # rows.append([camper.uuid, camper.first_name, camper.last_name, t + 1])
                     camper.set_team(t + 1)
 
         if args_no_output is not True:
