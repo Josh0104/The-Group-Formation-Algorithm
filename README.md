@@ -38,9 +38,10 @@ python3 main.py --input <path/to/file>
 | `-g`             | `--group`         | `int`                 | `5`                      | Number of groups to form                                     |
 | `-p`             | `--print`         | `flag`                | `False`                  | Print the output to console                                  |
 | `-o`             | `--output`        | `path/to/output.csv`  | `./output`               | Path for output file                                         |
-| `-n`             | `--no-output`     | `flag`                | `False`                  | Do not generate an output file                                |
+| `-n`             | `--no-output`     | `flag`                | `False`                  | Do not generate an output file                               |
 | `-v`             | `--verbose`       | `flag`                | `False`                  | Generate gurobi solution to console                          |
-| `--no-gui`       |   -               | `flag`                | `False`                  | Prevent the program to create a graphical user interface     |
+| `--no-gui`       |   -               | `flag`                | `False`                  | Prevent the program to create the graphical user interface     |
+| `--solver`       |   -               | `GRB` , `CBC`         | -                        | What optimization solver to use                              |
 
 
 

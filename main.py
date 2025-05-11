@@ -15,6 +15,7 @@ def args_parser():
     parser.add_argument("-n", "--no-output", help="Do not generate an output file", action="store_true")
     parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true")
     parser.add_argument("--no-gui", help="Do not run the GUI", action="store_true")
+    parser.add_argument("--solver", help="Solver to use, example GRB, CBC etc", type=str)
 
     args = parser.parse_args()
     app_config.args = args 
@@ -61,7 +62,8 @@ def run_formation(relations_data):
         args.output,
         args.no_output,
         args.verbose,
-        relations_data
+        relations_data,
+        args.solver
     )
 
 
