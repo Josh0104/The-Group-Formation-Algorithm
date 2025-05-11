@@ -355,7 +355,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': creativity_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#57b8ff'}
                 }]
             }).classes("w-full max-w-4xl")
         
@@ -369,7 +369,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': bible_knowledge_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#c83e4d'}
                 }]
             }).classes("w-full max-w-4xl")   
         
@@ -383,7 +383,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': physical_fit_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#fbb13c'}
                 }]
             }).classes("w-full max-w-4xl")
             
@@ -397,7 +397,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': musicians_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#fe6847'}
                 }]
             }).classes("w-full max-w-4xl")
         
@@ -411,7 +411,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': camp_experience_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#63C7B2'}
                 }]
             }).classes("w-full max-w-4xl")
         
@@ -425,7 +425,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': acting_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#d5b942'}
                 }]
             }).classes("w-full max-w-4xl")
         
@@ -439,7 +439,7 @@ def update_team_ui():
                 'series': [{
                     'type': 'bar',
                     'data': prop_design_scores,
-                    'itemStyle': {'color': '#4F46E5'}
+                    'itemStyle': {'color': '#7dc95e'}
                 }]
             }).classes("w-full max-w-4xl")
             

@@ -24,7 +24,8 @@ class Person :
         self.a10 = a10
         self.team = None
         self.age = self.get_age()
-
+        self.age_group = AgeGroup.from_age(self.age, self.gender)
+        
     def get_age(self) -> int:
         today = date(2025, 5, 28) # Date of the current camp, change if needed
         return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
@@ -117,6 +118,25 @@ class AnswerOption(Enum):
         else:
             return "No"
     
+class AgeGroup(Enum):
+    MALE = 0
+    FEMALE = 1
+    YOUTH = 2
+    KID = 3
+    BABY = 4
+    
+    # if above 25, its by gender, otherwise between 13 to 24 = Youth, 5 - 12 = Kid and below 5 = Baby
+    @staticmethod
+    def from_age(age: int, gender: Gender) -> 'AgeGroup':
+        if age >= 25:
+            return AgeGroup.MALE if gender == Gender.MALE else Gender.FEMALE
+        elif age >= 13:
+            return AgeGroup.YOUTH
+        elif age >= 5:
+            return AgeGroup.KID
+        else:
+            return AgeGroup.BABY
+
 
 class Relation:
     def __init__(self, id, uuid_1, name_1, name_2, uuid_2, relation, weight, description):
