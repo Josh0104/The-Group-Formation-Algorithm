@@ -24,7 +24,7 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 def dashboard() -> None:
     global relation_table
     add_layout()
-    global team_container, chart_container, format_setting_container, separator_line
+    global team_container, chart_container, format_setting_container, separator_line, label_info_chart
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
@@ -147,6 +147,7 @@ def dashboard() -> None:
         separator_line = ui.separator().classes("hidden")
         format_setting_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
+        label_info_chart = ui.label("In the charts the answers are translated into points as follows: Yes = 3, Maybe = 1, and No = 0.").classes("mt-[3rem] text-sm hidden")
         chart_container = ui.row().classes("w-full justify-center hidden")
 
 
@@ -234,11 +235,12 @@ def save_solution():
 
 # Update team + chart UI
 def update_team_ui():
-    global team_container, chart_container
+    global team_container, chart_container, label_info_chart
     separator_line.classes(remove='hidden')
     format_setting_container.classes(remove='hidden')
     team_container.classes(remove='hidden')
     chart_container.classes(remove='hidden')
+    label_info_chart.classes(remove='hidden')
 
     format_setting_container.clear()
     team_container.clear()
@@ -329,7 +331,7 @@ def update_team_ui():
         acting_scores = [team_stats[team]['acting'] for team, _ in teams_data]
         prop_design_scores = [team_stats[team]['prop_design'] for team, _ in teams_data]
         
-
+        
 
         with chart_container:
             ui.echart(
