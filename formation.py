@@ -55,7 +55,8 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     avg_babies = sum(babies) / num_teams
     
 
-    m = Model(solver_name=GUROBI)
+    # m = Model(solver_name=GUROBI)
+    m = Model()
     m.verbose = 0 if args_verbose is False else 1 # Print solver output
     m.max_seconds = 120 # Set a time limit of 120 seconds
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
@@ -126,7 +127,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         1.0 * leadership_imbalance[t] +
         1.0 * creativity_imbalance[t] +
         1.0 * bible_imbalance[t] +
-        0.75 * music_imbalance[t] +
+        1.0 * music_imbalance[t] +
         0.5 * experience_imbalance[t] +
         1.0 * performance_imbalance[t] + 
         1.0 * prop_imbalance[t] + 

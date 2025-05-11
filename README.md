@@ -70,8 +70,15 @@ deactivate
 
 The dependencies for this project are listed in the [`requirements.txt`](requirements.txt) file.  
 
-### Gurobi License  
-To obtain results, a **Gurobi license** is required. You can find instructions on how to get a license on their [official website](https://www.gurobi.com/).
+### Optimization Solvers
+
+To solve optimization problems, you can use either **CBC** (an open-source solver) or **Gurobi** (a commercial solver).  
+Please note that **Gurobi** requires a valid license.
+
+### Gurobi License
+
+To use Gurobi, you must obtain a **Gurobi license**.  
+Instructions for acquiring a license can be found on their [official website](https://www.gurobi.com/).
 
 
 ## Additional Notes
