@@ -119,23 +119,23 @@ class AnswerOption(Enum):
             return "No"
     
 class AgeGroup(Enum):
-    MALE = 0
-    FEMALE = 1
+    MEN = 0
+    WOMEN = 1
     YOUTH = 2
-    KID = 3
-    BABY = 4
+    KIDS = 3
+    BABIES = 4
     
     # if above 25, its by gender, otherwise between 13 to 24 = Youth, 5 - 12 = Kid and below 5 = Baby
     @staticmethod
     def from_age(age: int, gender: Gender) -> 'AgeGroup':
         if age >= 25:
-            return AgeGroup.MALE if gender == Gender.MALE else Gender.FEMALE
+            return AgeGroup.MEN if gender == Gender.MALE else AgeGroup.WOMEN
         elif age >= 13:
             return AgeGroup.YOUTH
         elif age >= 5:
-            return AgeGroup.KID
+            return AgeGroup.KIDS
         else:
-            return AgeGroup.BABY
+            return AgeGroup.BABIES
 
 
 class Relation:

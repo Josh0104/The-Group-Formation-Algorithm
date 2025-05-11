@@ -193,6 +193,7 @@ async def run_optimizer():
     try:
         people = await run.io_bound(lambda: main.run_formation(relation_data))
         if people is None:
+            print("No solution found")
             ui.notify("No solution found", color="negative")
             return
         

@@ -6,7 +6,7 @@ import csv
 import random
 import relations as Relations
 from datetime import datetime
-from person import Person
+from person import Person, AgeGroup
 
 # Global variable to store last model for saving
 last_model = None
@@ -28,6 +28,12 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     camp_experience = [p.a6.value for p in campers]
     performance_experience = [p.a7.value for p in campers]
     prop_design = [p.a8.value for p in campers]
+    # Age groups
+    men = [1 if p.age_group == AgeGroup.MEN else 0 for p in campers]    
+    women = [1 if p.age_group == AgeGroup.WOMEN else 0 for p in campers]
+    youth = [1 if p.age_group == AgeGroup.YOUTH else 0 for p in campers]
+    kids = [1 if p.age_group == AgeGroup.KIDS else 0 for p in campers]
+    babies = [1 if p.age_group == AgeGroup.BABIES else 0 for p in campers]
 
     num_campers = len(campers)
     teams = range(num_teams)
@@ -41,6 +47,13 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     avg_experience = sum(camp_experience) / num_teams
     avg_performance = sum(performance_experience) / num_teams
     avg_prop_design = sum(prop_design) / num_teams
+    # Calculate average for each age group
+    avg_men = sum(men) / num_teams
+    avg_women = sum(women) / num_teams
+    avg_youth = sum(youth) / num_teams
+    avg_kids = sum(kids) / num_teams
+    avg_babies = sum(babies) / num_teams
+    
 
     m = Model(solver_name=GUROBI)
     m.verbose = 0 if args_verbose is False else 1 # Print solver output
@@ -60,6 +73,12 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     experience_imbalance = [m.add_var() for _ in teams]
     performance_imbalance = [m.add_var() for _ in teams]
     prop_imbalance = [m.add_var() for _ in teams]
+    # Define Age Imbalance Variables
+    men_imbalance = [m.add_var() for _ in teams]
+    women_imbalance = [m.add_var() for _ in teams]
+    youth_imbalance = [m.add_var() for _ in teams]
+    kids_imbalance = [m.add_var() for _ in teams]
+    babies_imbalance = [m.add_var() for _ in teams]
     avg_team_size = num_campers / num_teams # Average team size
     plus_minus = 2 # Allowable deviation from average team size
     min_team_size = int(avg_team_size - plus_minus) # Minimum team size (±)
@@ -84,20 +103,38 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += performance_imbalance[t] >= avg_performance - xsum(performance_experience[c] * x[c][t] for c in camper_ids)
         m += prop_imbalance[t] >= xsum(prop_design[c] * x[c][t] for c in camper_ids) - avg_prop_design
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
+        # Balance constraints per age group
+        m += men_imbalance[t] >= xsum(men[c] * x[c][t] for c in camper_ids) - avg_men
+
+        m += men_imbalance[t] >= avg_men - xsum(men[c] * x[c][t] for c in camper_ids)
+        m += women_imbalance[t] >= xsum(women[c] * x[c][t] for c in camper_ids) - avg_women
+        m += women_imbalance[t] >= avg_women - xsum(women[c] * x[c][t] for c in camper_ids)
+        m += youth_imbalance[t] >= xsum(youth[c] * x[c][t] for c in camper_ids) - avg_youth
+        m += youth_imbalance[t] >= avg_youth - xsum(youth[c] * x[c][t] for c in camper_ids)
+        m += kids_imbalance[t] >= xsum(kids[c] * x[c][t] for c in camper_ids) - avg_kids
+        m += kids_imbalance[t] >= avg_kids - xsum(kids[c] * x[c][t] for c in camper_ids)
+        m += babies_imbalance[t] >= xsum(babies[c] * x[c][t] for c in camper_ids) - avg_babies
+        m += babies_imbalance[t] >= avg_babies - xsum(babies[c] * x[c][t] for c in camper_ids)
+
         m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
         m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
-
 
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
     m.objective += xsum(random_weights[t] * (
         1.0 * imbalance[t] +
+        1.0 * leadership_imbalance[t] +
         1.0 * creativity_imbalance[t] +
         1.0 * bible_imbalance[t] +
         0.75 * music_imbalance[t] +
         0.5 * experience_imbalance[t] +
         1.0 * performance_imbalance[t] + 
-        1.0 * prop_imbalance[t]
+        1.0 * prop_imbalance[t] + 
+        1.0 * men_imbalance[t] +
+        1.0 * women_imbalance[t] +
+        1.0 * youth_imbalance[t] +
+        1.0 * kids_imbalance[t] +
+        1.0 * babies_imbalance[t]
     ) for t in teams)
     
     # Add relations constraints
