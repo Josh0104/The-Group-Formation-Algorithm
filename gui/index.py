@@ -153,18 +153,30 @@ def dashboard() -> None:
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
     total = len(team_members)
-    leadership = sum(1 for p in team_members if AnswerOption.YES == p.a1)
-    skill_total = sum(p.a4.value for p in team_members if p.a4 is not None)
-    total_musicians = sum(1 for p in team_members if p.a5 == AnswerOption.YES)
+    leadership = sum(p.a1.value for p in team_members)
+    creativity_total = sum(p.a2.value for p in team_members)
+    bible_knowledge_total = sum(p.a3.value for p in team_members)
+    physcially_fit_total = sum(p.a4.value for p in team_members)
+    musicians_total = sum(p.a5.value for p in team_members)
+    camp_experience_total = sum(p.a6.value for p in team_members)
+    acting_total = sum(p.a7.value for p in team_members)
+    prop_design_total = sum(p.a8.value for p in team_members)
+    
+    
     total_male = sum(1 for p in team_members if p.gender == Gender.MALE and p.get_age() > 24)
     total_female = sum(1 for p in team_members if p.gender == Gender.FEMALE and p.get_age() > 24)
     total_youth = sum(1 for p in team_members if 13 <= p.get_age() <= 24)
     total_kids = sum(1 for p in team_members if 5 <= p.get_age() <= 12)
     total_babies = sum(1 for p in team_members if p.get_age() < 5)
     return {'total': total, 
-            'leaders': leadership, 
-            'skill': skill_total, 
-            'musicians': total_musicians, 
+            'leadership': leadership, 
+            'creativity': creativity_total,
+            'bible_knowledge': bible_knowledge_total,
+            'physcially_fit': physcially_fit_total,
+            'musicians': musicians_total, 
+            'camp_experience': camp_experience_total,
+            'acting': acting_total,
+            'prop_design': prop_design_total,
             'male': total_male,
             'female': total_female,
             'youth': total_youth,
@@ -308,21 +320,129 @@ def update_team_ui():
                             sort_age()                        
 
         labels = [f'Team {team}' for team, _ in teams_data]
-        skills = [team_stats[team]['skill'] for team, _ in teams_data]
+        leadership_scores = [team_stats[team]['leadership'] for team, _ in teams_data]
+        creativity_scores = [team_stats[team]['creativity'] for team, _ in teams_data]
+        bible_knowledge_scores = [team_stats[team]['bible_knowledge'] for team, _ in teams_data]
+        physical_fit_scores = [team_stats[team]['physcially_fit'] for team, _ in teams_data]
+        musicians_scores = [team_stats[team]['musicians'] for team, _ in teams_data]
+        camp_experience_scores = [team_stats[team]['camp_experience'] for team, _ in teams_data]
+        acting_scores = [team_stats[team]['acting'] for team, _ in teams_data]
+        prop_design_scores = [team_stats[team]['prop_design'] for team, _ in teams_data]
+        
+
 
         with chart_container:
             ui.echart(
                 {
-                'title': {'text': 'Total Skill Score per Team'},
+                'title': {'text': 'Total leadership score score per team'},
                 'tooltip': {},
                 'xAxis': {'type': 'category', 'data': labels},
                 'yAxis': {'type': 'value'},
                 'series': [{
                     'type': 'bar',
-                    'data': skills,
+                    'data': leadership_scores,
                     'itemStyle': {'color': '#4F46E5'}
                 }]
             }).classes("w-full max-w-4xl")
+            
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total creativity score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': creativity_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+        
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total Bible knowledge score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': bible_knowledge_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")   
+        
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total physically fit score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': physical_fit_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+            
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total musicians score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': musicians_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+        
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total camp experience score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': camp_experience_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+        
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total acting score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': acting_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+        
+        with chart_container:
+            ui.echart(
+                {
+                'title': {'text': 'Total prop design score per team'},
+                'tooltip': {},
+                'xAxis': {'type': 'category', 'data': labels},
+                'yAxis': {'type': 'value'},
+                'series': [{
+                    'type': 'bar',
+                    'data': prop_design_scores,
+                    'itemStyle': {'color': '#4F46E5'}
+                }]
+            }).classes("w-full max-w-4xl")
+            
             
     # Scroll down to the results
     ui.run_javascript('''
