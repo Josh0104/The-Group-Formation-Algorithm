@@ -13,3 +13,4 @@ def settings():
         dark = ui.dark_mode()
         
         ui.switch('Dark mode', on_change=lambda e: dark.enable() if e.value else dark.disable()).bind_value(app.storage.general, 'dark_mode')
+        

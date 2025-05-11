@@ -9,6 +9,7 @@ import os
 import main as main
 from gui.layout import add_layout
 import csv
+from gui.display import display_teams as dt
 
 # Global variables
 teams_data: list[tuple] = []
@@ -24,7 +25,7 @@ loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center 
 def dashboard() -> None:
     global relation_table
     add_layout()
-    global team_container, chart_container, format_setting_container, separator_line, label_info_chart
+    global team_container, chart_container, format_setting_container, separator_line
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
@@ -147,7 +148,6 @@ def dashboard() -> None:
         separator_line = ui.separator().classes("hidden")
         format_setting_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
         team_container = ui.column().classes("w-full max-w-4xl mx-auto gap-4 hidden")
-        label_info_chart = ui.label("In the charts the answers are translated into points as follows: Yes = 3, Maybe = 1, and No = 0.").classes("mt-[3rem] text-sm hidden")
         chart_container = ui.row().classes("w-full justify-center hidden")
 
 
@@ -236,217 +236,21 @@ def save_solution():
 
 # Update team + chart UI
 def update_team_ui():
-    global team_container, chart_container, label_info_chart
-    separator_line.classes(remove='hidden')
-    format_setting_container.classes(remove='hidden')
-    team_container.classes(remove='hidden')
-    chart_container.classes(remove='hidden')
-    label_info_chart.classes(remove='hidden')
-
-    format_setting_container.clear()
-    team_container.clear()
-    chart_container.clear()
-    team_cards.clear()
+    global team_container
     
-    def change_sort_format(e):
-        team_container.clear()
-        chart_container.clear()
-        team_cards.clear()
-        display_teams(e)
+    # def change_sort_format(e):
+    #     team_container.clear()
+    #     chart_container.clear()
+    #     team_cards.clear()
 
-    with format_setting_container:
-        selectSortFormatOptions = ["Alphabetical", "Age"]
-        selectSortFormat = ui.select(options=selectSortFormatOptions, value=selectSortFormatOptions[0], on_change=change_sort_format)
+    # with format_setting_container:
+    #     selectSortFormatOptions = ["Alphabetical", "Age"]
+    #     selectSortFormat = ui.select(options=selectSortFormatOptions, value=selectSortFormatOptions[0], on_change=change_sort_format)
         
     team_container.clear()
-    chart_container.clear()
+    chart_container.clear()        
+                                      
 
-    def display_teams(selectSortFormat):
-        for team, members in teams_data:
-            with team_container:
-                stat = team_stats[team]
-                with ui.expansion(f'Team {team}', icon='group',caption=f'Total: {stat["total"]} | Male: {stat["male"]} | Female: {stat["female"]} | Youth: {stat["youth"]} | Kids: {stat["kids"]} | Babies: {stat["babies"]} | Musicians {stat["musicians"]}').classes('w-full') as exp:
-                    with ui.column().classes("pl-4"):
-                        # Categorize by age + gender
-                        def sort_alpha():
-                            # Sort members alphabetically
-                            sorted_members = sorted(members, key=lambda x: (x.first_name.lower(), x.last_name.lower()))
-                            num = 0
-                            for person in sorted_members:
-                                num += 1
-                                ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
-                                team_cards.append(exp)
-
-                        def sort_age():
-                            def get_age_category(person: Person) -> str:
-                                age = person.get_age()
-                                if age > 24:
-                                    return "Male" if person.gender == Gender.MALE else "Female"
-                                elif 13 <= age <= 24:
-                                    return "Youth"
-                                elif 5 <= age <= 12:
-                                    return "Kids"
-                                else:
-                                    return "Babies"
-
-                            # Inside your UI rendering:
-                            categories = {
-                                "Male": [],
-                                "Female": [],
-                                "Youth": [],
-                                "Kids": [],
-                                "Babies": [],
-                            }
-
-                            # Fill buckets
-                            for m in members:
-                                cat = get_age_category(m)
-                                categories[cat].append(m)
-
-                            # Display in order, sorted alphabetically within each category
-                            category_order = ["Male", "Female", "Youth", "Kids", "Babies"]
-                            num = 0
-
-                            for cat in category_order:
-                                people = sorted(categories[cat], key=lambda x: (x.first_name.lower(), x.last_name.lower()))
-                                if people:
-                                    ui.label(f"{cat} - {len(people)}").classes("font-semibold mt-2")
-                                    for person in people:
-                                        num += 1
-                                        ui.markdown(f"{num}. {person.first_name} {person.last_name} {label_roles(person)}").classes("text-sm")
-                                        
-                                        team_cards.append(exp)
-                        
-                        if selectSortFormat.value == "Alphabetical":
-                            sort_alpha()
-                        elif selectSortFormat.value == "Age":
-                            sort_age()                        
-
-        labels = [f'Team {team}' for team, _ in teams_data]
-        leadership_scores = [team_stats[team]['leadership'] for team, _ in teams_data]
-        creativity_scores = [team_stats[team]['creativity'] for team, _ in teams_data]
-        bible_knowledge_scores = [team_stats[team]['bible_knowledge'] for team, _ in teams_data]
-        physical_fit_scores = [team_stats[team]['physcially_fit'] for team, _ in teams_data]
-        musicians_scores = [team_stats[team]['musicians'] for team, _ in teams_data]
-        camp_experience_scores = [team_stats[team]['camp_experience'] for team, _ in teams_data]
-        acting_scores = [team_stats[team]['acting'] for team, _ in teams_data]
-        prop_design_scores = [team_stats[team]['prop_design'] for team, _ in teams_data]
-        
-        
-
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total leadership score score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': leadership_scores,
-                    'itemStyle': {'color': '#4F46E5'}
-                }]
-            }).classes("w-full max-w-4xl")
-            
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total creativity score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': creativity_scores,
-                    'itemStyle': {'color': '#57b8ff'}
-                }]
-            }).classes("w-full max-w-4xl")
-        
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total Bible knowledge score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': bible_knowledge_scores,
-                    'itemStyle': {'color': '#c83e4d'}
-                }]
-            }).classes("w-full max-w-4xl")   
-        
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total physically fit score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': physical_fit_scores,
-                    'itemStyle': {'color': '#fbb13c'}
-                }]
-            }).classes("w-full max-w-4xl")
-            
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total musicians score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': musicians_scores,
-                    'itemStyle': {'color': '#fe6847'}
-                }]
-            }).classes("w-full max-w-4xl")
-        
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total camp experience score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': camp_experience_scores,
-                    'itemStyle': {'color': '#63C7B2'}
-                }]
-            }).classes("w-full max-w-4xl")
-        
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total acting score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': acting_scores,
-                    'itemStyle': {'color': '#d5b942'}
-                }]
-            }).classes("w-full max-w-4xl")
-        
-        with chart_container:
-            ui.echart(
-                {
-                'title': {'text': 'Total prop design score per team'},
-                'tooltip': {},
-                'xAxis': {'type': 'category', 'data': labels},
-                'yAxis': {'type': 'value'},
-                'series': [{
-                    'type': 'bar',
-                    'data': prop_design_scores,
-                    'itemStyle': {'color': '#7dc95e'}
-                }]
-            }).classes("w-full max-w-4xl")
-            
-            
     # Scroll down to the results
     ui.run_javascript('''
     let start = window.scrollY;
@@ -470,7 +274,8 @@ def update_team_ui():
     });
     ''')
     # Display teams based on selected sort format
-    display_teams(selectSortFormat)
+    # display_teams(selectSortFormat)
+    dt("Alphabetical",teams_data)
 
 def label_roles(person : Person) -> str:
     roles = []
