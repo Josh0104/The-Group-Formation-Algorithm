@@ -1,9 +1,14 @@
+# Ignore everything in data and its subfolders
+data/**
 
+# BUT keep any file that ends with 'sample.csv' in data/ (any subfolder)
+!data/**/sample.csv
+!data/**/sample_*.csv
+!data/**/*_sample.csv
 
-# ignore all files in the data directory except the sample files
-data/*
-!data/people/campers_sample.csv
-!data/relations/relations_sample.csv
+# Also keep folders so git can track structure
+!data/
+!data/**/
 
 # Ignore all csv file in output directory
 /output/*.csv
