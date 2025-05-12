@@ -2,8 +2,8 @@
 
 # ignore all files in the data directory except the sample files
 data/*
-!data/people/sample.csv
-!data/relations/sample.csv
+!data/people/campers_sample.csv
+!data/relations/relations_sample.csv
 
 # Ignore all csv file in output directory
 /output/*.csv
