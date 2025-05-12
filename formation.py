@@ -1,5 +1,4 @@
-from mip import Model, xsum, BINARY, minimize, OptimizationStatus
-import gurobipy as gp
+from mip import Model, xsum, BINARY, OptimizationStatus
 import os
 import time
 import csv

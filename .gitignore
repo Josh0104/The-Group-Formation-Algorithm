@@ -1,12 +1,9 @@
-# Ignore everything in data/ and subfolders
-/data/**
 
-# But keep folders so git can access files inside them
-!data/
-!data/**/
- 
-# Then un-ignore test*.csv files inside data/ and any subfolder
-!data/**/test*.csv
+
+# ignore all files in the data directory except the sample files
+data/*
+!data/people/sample.csv
+!data/relations/sample.csv
 
 # Ignore all csv file in output directory
 /output/*.csv
