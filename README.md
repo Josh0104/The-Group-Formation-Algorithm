@@ -41,7 +41,7 @@ python3 main.py --input <path/to/file>
 | `-n`             | `--no-output`     | `flag`                | `False`                  | Do not generate an output file                               |
 | `-v`             | `--verbose`       | `flag`                | `False`                  | Generate gurobi solution to console                          |
 | `--no-gui`       |   -               | `flag`                | `False`                  | Prevent the program to create the graphical user interface     |
-| `--solver`       |   -               | `GRB` , `CBC`         | -                        | What optimization solver to use                              |
+| `--solver`       |   -               | `GRB` , `CBC`         | `CBC`                    | What optimization solver to use                              |
 
 
 
