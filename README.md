@@ -34,7 +34,7 @@ python3 main.py --input <path/to/file>
 
 | Argument         | Alternative       | Value Format          | Default Value            | Description                                                  |
 |------------------|-------------------|-----------------------|--------------------------|--------------------------------------------------------------|
-| `-i`             | `--input`         | `path/to/input.csv`   | `data/people/people.csv` | File input to read                                           |
+| `-i`             | `--input`         | `path/to/input.csv`   | `data/people/campers_sample.csv` | File input to read                                           |
 | `-g`             | `--group`         | `int`                 | `5`                      | Number of groups to form                                     |
 | `-p`             | `--print`         | `flag`                | `False`                  | Print the output to console                                  |
 | `-o`             | `--output`        | `path/to/output.csv`  | `./output`               | Path for output file                                         |
