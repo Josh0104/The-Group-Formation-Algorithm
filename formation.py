@@ -20,9 +20,9 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
 
     # Extract attributes from campers
     leadership = [p.a1.value for p in campers]
-    skill_levels = [p.a4.value for p in campers]
     creativity = [p.a2.value for p in campers]
     bible_knowledge = [p.a3.value for p in campers]
+    physcial_fit = [p.a4.value for p in campers]
     musical_ability = [p.a5.value for p in campers]
     camp_experience = [p.a6.value for p in campers]
     performance_experience = [p.a7.value for p in campers]
@@ -39,9 +39,9 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     camper_ids = range(num_campers)
 
     avg_leadership = sum(leadership) / num_teams
-    avg_skill = sum(skill_levels) / num_teams
     avg_creativity = sum(creativity) / num_teams
     avg_bible = sum(bible_knowledge) / num_teams
+    avg_physcial_fit = sum(physcial_fit) / num_teams
     avg_music = sum(musical_ability) / num_teams
     avg_experience = sum(camp_experience) / num_teams
     avg_performance = sum(performance_experience) / num_teams
@@ -69,10 +69,10 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += xsum(x[c][t] for t in teams) == 1
 
     # Define Team Imbalance Variables
-    imbalance = [m.add_var() for _ in teams]
     leadership_imbalance = [m.add_var() for _ in teams]
     creativity_imbalance = [m.add_var() for _ in teams]
     bible_imbalance = [m.add_var() for _ in teams]
+    physcial_fit_imbalance = [m.add_var() for _ in teams]
     music_imbalance = [m.add_var() for _ in teams]
     experience_imbalance = [m.add_var() for _ in teams]
     performance_imbalance = [m.add_var() for _ in teams]
@@ -91,14 +91,14 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     # Balance constraints per skill
     # imbalance ≥ absolute difference between actual skill in team and average skill.
     for t in teams:
-        m += imbalance[t] >= xsum(skill_levels[c] * x[c][t] for c in camper_ids) - avg_skill
-        m += imbalance[t] >= avg_skill - xsum(skill_levels[c] * x[c][t] for c in camper_ids)
         m += leadership_imbalance[t] >= xsum(leadership[c] * x[c][t] for c in camper_ids) - avg_leadership
         m += leadership_imbalance[t] >= avg_leadership - xsum(leadership[c] * x[c][t] for c in camper_ids)
         m += creativity_imbalance[t] >= xsum(creativity[c] * x[c][t] for c in camper_ids) - avg_creativity
         m += creativity_imbalance[t] >= avg_creativity - xsum(creativity[c] * x[c][t] for c in camper_ids)
         m += bible_imbalance[t] >= xsum(bible_knowledge[c] * x[c][t] for c in camper_ids) - avg_bible
         m += bible_imbalance[t] >= avg_bible - xsum(bible_knowledge[c] * x[c][t] for c in camper_ids)
+        m += physcial_fit_imbalance[t] >= xsum(physcial_fit[c] * x[c][t] for c in camper_ids) - avg_physcial_fit
+        m += physcial_fit_imbalance[t] >= avg_physcial_fit - xsum(physcial_fit[c] * x[c][t] for c in camper_ids)
         m += music_imbalance[t] >= xsum(musical_ability[c] * x[c][t] for c in camper_ids) - avg_music
         m += music_imbalance[t] >= avg_music - xsum(musical_ability[c] * x[c][t] for c in camper_ids)
         m += experience_imbalance[t] >= xsum(camp_experience[c] * x[c][t] for c in camper_ids) - avg_experience
@@ -126,10 +126,10 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
     m.objective += xsum(random_weights[t] * (
-        1.0 * imbalance[t] +
         1.0 * leadership_imbalance[t] +
         1.0 * creativity_imbalance[t] +
         1.0 * bible_imbalance[t] +
+        1.0 * physcial_fit_imbalance[t] +
         1.0 * music_imbalance[t] +
         0.5 * experience_imbalance[t] +
         1.0 * performance_imbalance[t] + 
