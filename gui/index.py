@@ -14,17 +14,20 @@ import csv
 teams_data: list[tuple] = []
 team_stats = {}
 team_cards = []
-loading_container = None
-loading = None
+loading_overlay = None
 
 # UI elements
-loading_container = ui.column().classes("fixed inset-0 z-50 hidden items-center justify-center bg-white/60")
 
 @ui.page('/')
 def dashboard() -> None:
-    global relation_table
+    global relation_table, loading_overlay
     add_layout()
     global team_container, chart_container, format_setting_container, separator_line, label_info_chart
+    loading_overlay = ui.column().classes('fixed inset-0 z-50 hidden items-center justify-center bg-black/80')
+    
+    with loading_overlay:
+        ui.spinner('hourglass',size='4rem', color='blue')
+        ui.label('Loading').classes('text-white text-xl mt-4')
     
     from app_config import args  # access shared args
     person_dict = cr.read_csv_pd(args.input)
@@ -151,6 +154,14 @@ def dashboard() -> None:
         chart_container = ui.row().classes("w-full justify-center hidden")
 
 
+# Toggle visibility function
+def show_loading():
+    loading_overlay.classes(remove='hidden')
+
+def hide_loading():
+    loading_overlay.classes(add='hidden')
+
+
 # Compute stats
 def compute_stats(team_members: list[Person]) -> dict:
     total = len(team_members)
@@ -188,7 +199,7 @@ def compute_stats(team_members: list[Person]) -> dict:
 # Run optimizer
 async def run_optimizer():
     global teams_data, team_stats
-    loading_container.classes(remove='hidden')
+    show_loading()
     
     try:
         people = await run.io_bound(lambda: main.run_formation(relation_data))
@@ -220,7 +231,7 @@ async def run_optimizer():
         print(f"Error: {e}")
     
     finally:
-        loading_container.classes(add='hidden')
+        hide_loading()
 
 # Save current solution
 def save_solution():
