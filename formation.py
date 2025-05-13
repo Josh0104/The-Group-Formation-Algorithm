@@ -77,6 +77,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     experience_imbalance = [m.add_var() for _ in teams]
     performance_imbalance = [m.add_var() for _ in teams]
     prop_imbalance = [m.add_var() for _ in teams]
+    
     # Define Age Imbalance Variables
     men_imbalance = [m.add_var() for _ in teams]
     women_imbalance = [m.add_var() for _ in teams]
@@ -109,7 +110,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += prop_imbalance[t] >= avg_prop_design - xsum(prop_design[c] * x[c][t] for c in camper_ids)
         # Balance constraints per age group
         m += men_imbalance[t] >= xsum(men[c] * x[c][t] for c in camper_ids) - avg_men
-
         m += men_imbalance[t] >= avg_men - xsum(men[c] * x[c][t] for c in camper_ids)
         m += women_imbalance[t] >= xsum(women[c] * x[c][t] for c in camper_ids) - avg_women
         m += women_imbalance[t] >= avg_women - xsum(women[c] * x[c][t] for c in camper_ids)
