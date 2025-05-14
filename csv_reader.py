@@ -58,8 +58,6 @@ def read_csv_pd(file_path) -> dict[str, Person.Person]:
     # return sorted_dict 
 
 def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
-    if file_path == None:
-        file_path = "data/relations1.csv"
     
     df = pd.read_csv(file_path)
 
@@ -73,8 +71,8 @@ def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
         schema.columns_relations["description"] # 6
         ]]
 
-    dictRelations = {}
-    for i, row  in result.iterrows():
+    relations_list = []
+    for i, row in result.iterrows():
         uuid_1 = row.iloc[0]
         name_1 = row.iloc[1]
         name_2 = row.iloc[2]
@@ -82,8 +80,21 @@ def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
         relation = row.iloc[4]
         weight = row.iloc[5]
         description = row.iloc[6]
+        
+        id_1 = dictPersons[uuid_1].id
+        id_2 = dictPersons[uuid_2].id
 
-        dictRelations[row.iloc[0]] = Person.Relation(
-            i, uuid_1, name_1, name_2, uuid_2, relation, weight, description)
+        relations_list.append({
+                'id': i,
+                'uuid_1': uuid_1,
+                'name_1': name_1,
+                'name_2': name_2,
+                'uuid_2': uuid_2,
+                'relation': relation,
+                'weight': weight,
+                'description': description,
+                'id_1': id_1,
+                'id_2': id_2        
+                })
 
-    return dictRelations
+    return relations_list

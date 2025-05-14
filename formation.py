@@ -142,12 +142,13 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     ) for t in teams)
     
     # Add relations constraints
-    if relations_data is None:
-        print("No relations data provided.")
-        relations_data = Relations.get_relations(people,None)
+    # if relations_data is None:
+        # print("No relations data provided.")
+        # relations_data = Relations.get_relations(people,None)
 
     relations_together: list[tuple] = []
     relations_separate: list[tuple] = []
+    
     
     for r in relations_data:
         id_1 = r['id_1']
@@ -198,10 +199,11 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             print(f"Output saved to: {output_path}")
 
         if is_printing_output:
-            for c in campers:
-                print(c)
             for t in teams:
-                print(f"Team {t + 1}: {len([c for c in campers if c[3] == t + 1])}")
+                team_members = [c for c in campers if c.team == t + 1]
+                print(f"\nTeam {t + 1} - Total: {len(team_members)}")
+                for member in team_members:
+                    print(f"  {member.first_name} {member.last_name}")
         
         return campers
             

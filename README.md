@@ -37,12 +37,14 @@ python3 main.py --input <path/to/file>
 | `-i`             | `--input`         | `path/to/input.csv`   | `data/people/campers_sample.csv` | File input to read                                           |
 | `-g`             | `--group`         | `int`                 | `5`                      | Number of groups to form                                     |
 | `-p`             | `--print`         | `flag`                | `False`                  | Print the output to console                                  |
-| `-o`             | `--output`        | `path/to/output.csv`  | `./output`               | Path for output file                                         |
+| `-o`             | `--output`        | `path/to/output-folder`  | `./output`               | Path for output file                                         |
 | `-n`             | `--no-output`     | `flag`                | `False`                  | Do not generate an output file                               |
 | `-v`             | `--verbose`       | `flag`                | `False`                  | Generate gurobi solution to console                          |
 | `--no-gui`       |   -               | `flag`                | `False`                  | Prevent the program to create the graphical user interface   |
 | `--solver`       |   -               | `GRB` , `CBC`         | `CBC`                    | What optimization solver to use                              |
 | `--timeout`      |   -               | `int`                 | `120`                    | Maximum allowed runtime for the algorithm in seconds before stopping        |
+| `--relations`    |   -               | `path/to/relations.csv`| -                       | Path to relations csv file                                   |
+
 
 
 

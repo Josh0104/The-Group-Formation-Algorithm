@@ -17,7 +17,7 @@ def args_parser():
     parser.add_argument("--no-gui", help="Do not run the GUI", action="store_true")
     parser.add_argument("--solver", help="Solver to use, example GRB, CBC etc", type=str)
     parser.add_argument("--timeout", help="Timeout in seconds", type=int, default=120)
-    parser.add_argument("--relations", help="Path to relations data", type=str, default="data/relations.csv")
+    parser.add_argument("--relations", help="Path to relations data", type=str)
 
     args = parser.parse_args()
     app_config.args = args 
@@ -40,16 +40,19 @@ def args_parser():
     if args.group is None:
         args.group = 5
         if args.verbose:
-            print("⚠️  Number of groups not specified. Defaulting to 5 groups.")
+            print("Number of groups not specified. Defaulting to 5 groups.")
 
     return args
 
 
 def run_formation(relations_data):
     from app_config import args  # access shared args
-    print("relations_data", relations_data)
+    
     try:
         dict_uuid_person = cr.read_csv_pd(args.input)
+        if args.relations is not None:
+            relations_data = cr.read_relations_csv_pd(args.relations)
+        
     except FileNotFoundError as fnfe:
         print(fnfe)
         exit(1)
