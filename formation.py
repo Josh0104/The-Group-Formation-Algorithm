@@ -55,11 +55,10 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     
     if args_solver is not None:
         m = Model(solver_name=args_solver)
-        print(f"Using solver: {m.solver_name}")
     else:
         m = Model()
+    print(f"Using solver: {m.solver_name}")
         
-    m = Model()
     m.verbose = 0 if args_verbose is False else 1 # Print solver output
     m.max_seconds = args_timeout
     x = [[m.add_var(var_type=BINARY) for _ in teams] for _ in camper_ids]
@@ -172,6 +171,8 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
 
     # Save the model so GUI can access it
     last_model = m
+    
+    print(f'Total dataset size: {len(camper_ids)}')
 
     if m.status == OptimizationStatus.OPTIMAL:
         output_dir = "output"
