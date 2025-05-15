@@ -533,7 +533,7 @@ def add_constraint(person_a, person_b, relation_type):
     uuid_1, name_1, id_1 = person_a
     uuid_2, name_2, id_2 = person_b
 
-    # STEP 1: Check for direct duplicate or conflict
+    # Check for direct duplicate or conflict
     for relation in relation_data:
         u1, u2 = relation['uuid_1'], relation['uuid_2']
         rel_type = relation['relation']
@@ -548,7 +548,7 @@ def add_constraint(person_a, person_b, relation_type):
                 ui.notify(f"Invalid conflict: {name_1} and {name_2} already have a '{rel_type}' constraint", color="red")
             return
 
-    # STEP 2: Build TOGETHER graph
+    # Build TOGETHER graph
     from collections import defaultdict, deque
     graph = defaultdict(set)
     for r in relation_data:
@@ -556,7 +556,7 @@ def add_constraint(person_a, person_b, relation_type):
             graph[r['uuid_1']].add(r['uuid_2'])
             graph[r['uuid_2']].add(r['uuid_1'])
 
-    # STEP 3: Transitivity logic
+    # Transitivity logic
     def is_transitively_connected(start, target):
         visited = set()
         queue = deque([start])
@@ -570,19 +570,19 @@ def add_constraint(person_a, person_b, relation_type):
                     queue.append(neighbor)
         return False
 
-    # 3a: Prevent redundant transitive TOGETHER
+    # Prevent redundant transitive TOGETHER
     if relation_type.upper() == 'TOGETHER':
         if is_transitively_connected(uuid_1, uuid_2):
             ui.notify(f"Invalid transitive relation: {name_1} is already connected to {name_2} via other people", color="red")
             return
 
-    # 3b: Prevent SEPARATE between people already transitively together
+    # Prevent SEPARATE between people already transitively together
     if relation_type.upper() == 'SEPARATE':
         if is_transitively_connected(uuid_1, uuid_2):
             ui.notify(f"Invalid logic: cannot separate {name_1} and {name_2} — they are already transitively connected by TOGETHER constraints", color="red")
             return
     
-    # STEP 4: Add new valid relation
+    # Add new valid relation
     relation_data.append({
         'id_1': id_1,
         'id_2': id_2,
