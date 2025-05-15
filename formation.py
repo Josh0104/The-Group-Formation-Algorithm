@@ -7,11 +7,7 @@ import relations as Relations
 from datetime import datetime
 from person import Person, AgeGroup
 
-# Global variable to store last model for saving
-last_model = None
-
 def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data, args_solver, args_timeout): 
-    global last_model
 
     # Load data
     campers = list(people.values())
@@ -168,9 +164,6 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
             m += x[p][t] + x[q][t] <= 1
 
     m.optimize()
-
-    # Save the model so GUI can access it
-    last_model = m
     
     print(f'Total dataset size: {len(camper_ids)}')
 

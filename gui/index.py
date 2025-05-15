@@ -144,7 +144,6 @@ def dashboard() -> None:
             "RUN ALGORITHM",
                 on_click=lambda: run_optimizer()
                 ).classes("bg-primary text-white")        
-        ui.button("SAVE CURRENT SOLUTION", on_click=save_solution).classes("bg-green-600 text-white")
     
          #These start hidden
         separator_line = ui.separator().classes("hidden")
@@ -207,10 +206,6 @@ async def run_optimizer():
             print("No solution found")
             ui.notify("No solution found", color="negative")
             return
-        
-        people_dicts = [p.to_dict() for p in people]
-        app.storage.user['latest_solution'] = people_dicts # Store the latest solution in app storage user
-
 
         raw_teams: dict[int, list[Person]] = {}
         for p in people:
