@@ -56,7 +56,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     if args_solver is not None:
         m = Model(solver_name=args_solver)
     else:
-        m = Model()
+        m = Model('GRB')
     print(f"Using solver: {m.solver_name}")
         
     m.verbose = 0 if args_verbose is False else 1 # Print solver output
