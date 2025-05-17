@@ -5,7 +5,7 @@
 
 The algorithm is to output five teams with the use of the different constraints it has been given.
 
-You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-form)
+You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-formation)
 
 ## How to start the project
 
