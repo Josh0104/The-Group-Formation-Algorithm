@@ -27,7 +27,7 @@ venv\Scripts\activate
 
 To run the Python script with a file as input, use the following command:
 ```bash
-python3 main.py --input <path/to/file>
+python3 main.py
 ```
 
 ### Command-line Arguments
