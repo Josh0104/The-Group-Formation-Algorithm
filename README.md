@@ -47,7 +47,7 @@ Instructions for acquiring a license can be found on their [official website](ht
 
 ## For the developers of the project
 
-## Branch Naming Convention
+### Branch Naming Convention
 <details>
   <summary>📌 Click to expand branch categories</summary>
 
