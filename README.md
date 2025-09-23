@@ -9,22 +9,6 @@ You can read more about the project and how we handle the data: [link](https://c
 
 ## How to start the project
 
-
-Create a virtual environment with the python version 3.10
-```bash
-python3.10 -m venv venv
-```
-
-On macOS and Linux
-```bash 
-source venv/bin/activate
-```
-
-On Windows
-```bash
-venv\Scripts\activate
-```
-
 To run the Python script with a file as input, use the following command:
 ```bash
 python3 main.py
