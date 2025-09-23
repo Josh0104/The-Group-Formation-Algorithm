@@ -29,31 +29,6 @@ python3 main.py
 | `--timeout`      |   -               | `int`                 | `120`                    | Maximum allowed runtime for the algorithm in seconds before stopping        |
 | `--relations`    |   -               | `path/to/relations.csv`| -                       | Path to relations csv file                                   |
 
-
-
-
-<details>
-<summary> Alternative method  </summary>
-
-Direct Execution Without Activation
-
-macOS and Linux 
-```bash
-venv/bin/python main.py
-```
-
-Windows
-```bash
-venv\Scripts\python.exe main.py
-```
-</details>
-
-### To deactivate the Virtual Environment
-
-```bash
-deactivate
-```
-
 ### Required Packages  
 
 The dependencies for this project are listed in the [`requirements.txt`](requirements.txt) file.  
