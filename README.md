@@ -9,7 +9,9 @@ You can read more about the project and how we handle the data: [link](https://c
 
 ## How to start the project
 
-To run the Python script with a file as input, use the following command:
+You need to use python 3.10 version.
+
+To run the program, write the followling command on your terminal:
 ```bash
 python3 main.py
 ```
