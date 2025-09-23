@@ -43,14 +43,6 @@ Please note that **Gurobi** requires a valid license.
 To use Gurobi, you must obtain a **Gurobi license**.  
 Instructions for acquiring a license can be found on their [official website](https://www.gurobi.com/).
 
-
-## Additional Notes
-
-To create a virtual environment, run the following command
-```bash
-python3 -m venv venv
-```
-
 ## For the developers of the project
 
 ## Branch Naming Convention
