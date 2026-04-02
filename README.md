@@ -5,29 +5,15 @@
 
 The algorithm is to output five teams with the use of the different constraints it has been given.
 
-You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-form)
+You can read more about the project and how we handle the data: [link](https://camp.cbmbc.org/group-formation)
 
 ## How to start the project
 
+You need to use python 3.10 version.
 
-Create a virtual environment with the python version 3.10
+To run the program, write the followling command on your terminal:
 ```bash
-python3.10 -m venv venv
-```
-
-On macOS and Linux
-```bash 
-source venv/bin/activate
-```
-
-On Windows
-```bash
-venv\Scripts\activate
-```
-
-To run the Python script with a file as input, use the following command:
-```bash
-python3 main.py --input <path/to/file>
+python3 main.py
 ```
 
 ### Command-line Arguments
@@ -45,31 +31,6 @@ python3 main.py --input <path/to/file>
 | `--timeout`      |   -               | `int`                 | `120`                    | Maximum allowed runtime for the algorithm in seconds before stopping        |
 | `--relations`    |   -               | `path/to/relations.csv`| -                       | Path to relations csv file                                   |
 
-
-
-
-<details>
-<summary> Alternative method  </summary>
-
-Direct Execution Without Activation
-
-macOS and Linux 
-```bash
-venv/bin/python main.py
-```
-
-Windows
-```bash
-venv\Scripts\python.exe main.py
-```
-</details>
-
-### To deactivate the Virtual Environment
-
-```bash
-deactivate
-```
-
 ### Required Packages  
 
 The dependencies for this project are listed in the [`requirements.txt`](requirements.txt) file.  
@@ -84,17 +45,9 @@ Please note that **Gurobi** requires a valid license.
 To use Gurobi, you must obtain a **Gurobi license**.  
 Instructions for acquiring a license can be found on their [official website](https://www.gurobi.com/).
 
-
-## Additional Notes
-
-To create a virtual environment, run the following command
-```bash
-python3 -m venv venv
-```
-
 ## For the developers of the project
 
-## Branch Naming Convention
+### Branch Naming Convention
 <details>
   <summary>📌 Click to expand branch categories</summary>
 
