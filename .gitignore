@@ -10,8 +10,8 @@ data/**
 !data/
 !data/**/
 
-# Ignore all csv file in output directory
-/output/*.csv
+# Ignore all files in the output directory
+/output/**
 
 # ignoire .nicegui folder that holds storages 
 /.nicegui/

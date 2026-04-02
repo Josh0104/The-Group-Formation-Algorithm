@@ -4,6 +4,8 @@ import csv_reader as cr
 import formation as fm
 import gui.main_view as gui
 import app_config
+from pdf_export import export_teams_pdf
+
 
 def args_parser():
     parser = argparse.ArgumentParser()
@@ -60,7 +62,7 @@ def run_formation(relations_data):
         print(te)
         exit(1)
 
-    return fm.form_teams(
+    campers = fm.form_teams(
         dict_uuid_person,
         args.group,
         args.print,
@@ -71,6 +73,12 @@ def run_formation(relations_data):
         args.solver,
         args.timeout,
     )
+
+    if campers:
+        pdf_path = export_teams_pdf(campers)
+        print(f"PDF saved to: {pdf_path}")
+
+    return campers
 
 
 def main():
@@ -83,4 +91,11 @@ def main():
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    main()
+    try: 
+        main()
+    except KeyboardInterrupt:
+        print("\nShutting down cleanly...")
+        exit(0)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        exit(1)
