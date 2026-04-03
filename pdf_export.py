@@ -16,6 +16,7 @@ from reportlab.platypus import (
     Table,
     TableStyle,
     KeepTogether,
+    PageBreak,
 )
 from iso3166 import countries
 
@@ -78,6 +79,9 @@ def export_teams_pdf(
 
     story.append(build_summary_table(grouped_teams, team_stats, styles))
     story.append(Spacer(1, 8 * mm))
+    # build_summary_table
+    story.append(build_overview_all_teams_section(grouped_teams, team_stats, styles))
+    story.append(PageBreak())
 
     for team_number, members in grouped_teams.items():
         story.append(build_team_section(team_number, members, team_stats[team_number], styles))
@@ -241,6 +245,53 @@ def build_summary_table(
     ]))
     return table
 
+def build_overview_all_teams_section(
+    grouped_teams: dict[int, list[Person]],
+    team_stats: dict[int, dict[str, int]],
+    styles: dict[str, ParagraphStyle],
+) -> KeepTogether:
+    """Build a section that gives an overview of all teams (members in columns)."""
+
+    content = [Paragraph("Team Overview", styles["section_title"])]
+
+    # Column headers → Team 1, Team 2, ...
+    team_numbers = list(grouped_teams.keys())
+    header = [f"Team {t}" for t in team_numbers]
+    header.insert(0, "#")  # add extra header for row labels (if needed)
+
+    # Find longest team
+    max_size = max(len(members) for members in grouped_teams.values())
+
+    # Build table data (list of lists)  ← this is how ReportLab works  [oai_citation:0‡docs.reportlab.com](https://docs.reportlab.com/reportlab/userguide/ch7_tables/?utm_source=chatgpt.com)
+    data = [header]
+
+    for i in range(max_size):
+        row = [str(i + 1)]  # Row label (1, 2, 3, ...)
+        for t in team_numbers:
+            members = grouped_teams[t]
+            if i < len(members):
+                person = members[i]
+                row.append(f"{person.first_name} {person.last_name}")
+            else:
+                row.append("")  # empty cell if team shorter
+        data.append(row)
+
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1D4ED8")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D1D5DB")),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
+            colors.whitesmoke,
+            colors.HexColor("#F9FAFB"),
+        ]),
+    ]))
+
+    content.append(table)
+    return KeepTogether(content)
 
 def build_team_section(
     team_number: int,
