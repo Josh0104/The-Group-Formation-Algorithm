@@ -17,6 +17,8 @@ from reportlab.platypus import (
     TableStyle,
     KeepTogether,
 )
+from iso3166 import countries
+
 
 from person import Person, Gender, AgeGroup
 
@@ -56,7 +58,8 @@ def export_teams_pdf(
 
     doc = SimpleDocTemplate(
         output_path,
-        pagesize=landscape(A4),
+        pagesize=A4,
+        # pagesize=landscape(A4),
         leftMargin=12 * mm,
         rightMargin=12 * mm,
         topMargin=12 * mm,
@@ -292,7 +295,7 @@ def build_members_table(members: list[Person]) -> Table:
         "#",
         "First name",
         "Last name",
-        "Age",
+        # "Age",
         "Gender",
         "Country",
         "Age group",
@@ -304,9 +307,9 @@ def build_members_table(members: list[Person]) -> Table:
             index,
             person.first_name,
             person.last_name,
-            person.get_age(),
+            # person.get_age(),
             person.gender.name.title(),
-            person.country,
+            countries.get(person.country).name if person.country else "-",
             person.age_group.name.title(),
             # build_role_string(person),
         ])

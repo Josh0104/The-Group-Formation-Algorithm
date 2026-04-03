@@ -74,7 +74,7 @@ def run_formation(relations_data):
         args.timeout,
     )
 
-    if campers:
+    if campers and not args.no_output:
         pdf_path = export_teams_pdf(campers)
         print(f"PDF saved to: {pdf_path}")
 
