@@ -299,7 +299,7 @@ def build_members_table(members: list[Person]) -> Table:
         # "Age",
         "Gender",
         "Country",
-        "Age group",
+        "Group",
         # "Roles",
     ]]
 
