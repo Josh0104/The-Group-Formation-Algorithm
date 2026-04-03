@@ -265,10 +265,11 @@ def build_team_section(
 
 def build_team_stats_table(stats: dict[str, int]) -> Table:
     """Small stat block shown before the member list."""
+    total_score = stats["leadership"] + stats["creativity"] + stats["bible_knowledge"] + stats["physical_fit"] + stats["musicians"] + stats["camp_experience"] + stats["acting"] + stats["prop_design"]
     data = [
         ["Men", stats["men"], "Women", stats["women"], "Youth", stats["youth"], "Kids", stats["kids"], "Babies", stats["babies"]],
         ["Leadership", stats["leadership"], "Creativity", stats["creativity"], "Bible", stats["bible_knowledge"], "Physical", stats["physical_fit"], "Music", stats["musicians"]],
-        ["Experience", stats["camp_experience"], "Acting", stats["acting"], "Props", stats["prop_design"], "", "", "", "", "", ""],
+        ["Experience", stats["camp_experience"], "Acting", stats["acting"], "Props", stats["prop_design"], "Total Score", total_score, "", "", "", ""],
     ]
 
     table = Table(data, colWidths=[22 * mm, 10 * mm] * 5)
@@ -303,13 +304,20 @@ def build_members_table(members: list[Person]) -> Table:
     ]]
 
     for index, person in enumerate(members, start=1):
+        if person.country:
+            country_name = countries.get(person.country).name
+            if len(country_name) > 15: # if country name is too long
+                country_name = person.country
+        else:
+            country_name = "-"
+        
         rows.append([
             index,
             person.first_name,
             person.last_name,
             # person.get_age(),
             person.gender.name.title(),
-            countries.get(person.country).name if person.country else "-",
+            country_name,
             person.age_group.name.title(),
             # build_role_string(person),
         ])
