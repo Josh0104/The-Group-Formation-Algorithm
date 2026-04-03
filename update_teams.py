@@ -4,20 +4,24 @@ import os
 from dotenv import load_dotenv
 from supabase import create_client
 
-def load_supabase():
-    load_dotenv()
+
+def load_supabase(env_path: str):
+    if not os.path.exists(env_path):
+        raise ValueError(f"Env file not found: {env_path}")
+
+    load_dotenv(env_path)
 
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_KEY")
 
     if not url or not key:
-        raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY in .env")
+        raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY in env file")
 
     return create_client(url, key)
 
 
-def update_teams(csv_path: str):
-    supabase = load_supabase()
+def update_teams(csv_path: str, env_path: str):
+    supabase = load_supabase(env_path)
 
     rows = []
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -28,10 +32,9 @@ def update_teams(csv_path: str):
                 "team_id": int(row["Team"]),
             })
 
-    result = supabase.table("users").upsert(rows).execute()
+    supabase.table("users").upsert(rows).execute()
 
-    print(f"Updated {len(rows)} users")
-    return result
+    print(f"Updated {len(rows)} users using env file: {env_path}")
 
 
 if __name__ == "__main__":
@@ -44,14 +47,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--use-env",
-        action="store_true",
-        help="Use environment variables from .env"
+        "--env",
+        default=".env",
+        help="Path to .env file (default: .env)"
     )
 
     args = parser.parse_args()
 
-    if args.use_env:
-        update_teams(args.input)
-    else:
-        raise ValueError("You must use --use-env to load credentials securely")
+    update_teams(args.input, args.env)
