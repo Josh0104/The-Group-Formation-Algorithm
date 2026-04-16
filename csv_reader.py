@@ -98,3 +98,36 @@ def read_relations_csv_pd(file_path) -> dict[str, Person.Relation]:
                 })
 
     return relations_list
+
+def read_sizes_csv_pd(file_path) -> list[dict]:
+    """
+    Returns a flat list like:
+    [
+        {"size_label": "X-Small", "team_number": 1, "team_name": "Blue", "count": 4},
+        ...
+    ]
+    """
+    df = pd.read_csv(file_path, delimiter=';')
+
+    size_label_column = schema.columns_sizes["size_label"]
+
+    if size_label_column not in df.columns:
+        raise ValueError(f"Missing required column: {size_label_column}")
+
+    team_columns = [col for col in df.columns if col != size_label_column]
+
+    result = []
+
+    for _, row in df.iterrows():
+        size_label = row[size_label_column]
+
+        for team_index, team_name in enumerate(team_columns, start=1):
+            value = row[team_name]
+            result.append({
+                "size_label": size_label,
+                "team_number": team_index,
+                "team_name": team_name,
+                "count": int(value) if pd.notna(value) else 0,
+            })
+
+    return result

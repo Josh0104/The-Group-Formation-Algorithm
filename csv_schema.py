@@ -26,3 +26,7 @@ columns_relations = {
     "weight": "weight",
     "description": "description",
 }
+
+columns_sizes = {
+    "size_label": "sizeLabel",
+}
