@@ -20,6 +20,7 @@ def args_parser():
     parser.add_argument("--solver", help="Solver to use, example GRB, CBC etc", type=str)
     parser.add_argument("--timeout", help="Timeout in seconds", type=int, default=120)
     parser.add_argument("--relations", help="Path to relations data", type=str)
+    parser.add_argument("--sizes", help="Path to size.csv",type=str)
 
     args = parser.parse_args()
     app_config.args = args 
@@ -54,6 +55,8 @@ def run_formation(relations_data):
         dict_uuid_person = cr.read_csv_pd(args.input)
         if args.relations is not None:
             relations_data = cr.read_relations_csv_pd(args.relations)
+        if args.sizes is not None:
+            sizes_data = cr.read_sizes_csv_pd(args.sizes)
         
     except FileNotFoundError as fnfe:
         print(fnfe)
@@ -72,6 +75,7 @@ def run_formation(relations_data):
         relations_data,
         args.solver,
         args.timeout,
+        args.sizes
     )
 
     if campers and not args.no_output:

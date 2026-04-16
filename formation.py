@@ -7,7 +7,7 @@ import relations as Relations
 from datetime import datetime
 from person import Person, AgeGroup
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data, args_solver, args_timeout): 
+def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data, args_solver, args_timeout,args_sizes): 
 
     # Load data
     campers = list(people.values())
