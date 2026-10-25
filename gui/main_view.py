@@ -3,6 +3,7 @@ from gui.layout import add_layout
 import gui.settings 
 import gui.index
 import gui.result
+import gui.rooms
 
 def run_gui():
     

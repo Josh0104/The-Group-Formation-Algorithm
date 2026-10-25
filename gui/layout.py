@@ -13,13 +13,16 @@ def add_layout():
         ui.button(icon='r_list', on_click=lambda: left_drawer.toggle()).props('flat color=white')
         ui.label('Group Formation Builder').classes('text-lg')
         ui.space()
-        ui.button('Dashboard', on_click=lambda: ui.navigate.to('/')).props('color=dark:blue-900')
+        # ui.button('Dashboard', on_click=lambda: ui.navigate.to('/')).props('color=dark:blue-900')
         # ui.button('Results', on_click=lambda: ui.navigate.to('/results')).props('color=dark:blue-900')
         ui.button('Settings', on_click=lambda: ui.navigate.to('/settings')).props('color=dark:blue-900')
 
     with ui.left_drawer(value=False).classes("w-full dark:bg-slate-900 bg-slate-200") as left_drawer:
-        ui.label('Side Menu')
-        ui.button('Quit', on_click=app.shutdown, color='negative')
+        # ui.label('Side Menu')
+        ui.button('Team Dashboard').classes('w-full').on('click', lambda: ui.navigate.to('/'))
+        ui.button('Room Dashboard').classes('w-full').on('click', lambda: ui.navigate.to('/rooms'))
+        ui.button('Settings').classes('w-full').on('click', lambda: ui.navigate.to('/settings'))
+        ui.button('Quit', on_click=app.shutdown, color='negative').classes('w-full')
 
 
     with ui.footer(value=False).classes('dark:bg-slate-900 flex items-center') as footer:
