@@ -48,7 +48,7 @@ def args_parser():
     return args
 
 
-def run_formation(relations_data):
+def run_formation(relations_data, sizes_data = None):
     from app_config import args  # access shared args
     
     try:
@@ -56,6 +56,7 @@ def run_formation(relations_data):
         if args.relations is not None:
             relations_data = cr.read_relations_csv_pd(args.relations)
         if args.sizes is not None:
+            print("Hello")
             sizes_data = cr.read_sizes_csv_pd(args.sizes)
         
     except FileNotFoundError as fnfe:
@@ -75,7 +76,7 @@ def run_formation(relations_data):
         relations_data,
         args.solver,
         args.timeout,
-        args.sizes
+        sizes_data
     )
 
     if campers and not args.no_output:

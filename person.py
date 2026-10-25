@@ -1,17 +1,19 @@
 
 from datetime import date, datetime
 from enum import Enum
+from dateutil import parser
 
 class Person :
-    def __init__(self, id, uuid, first_name, last_name, birthday, gender, country, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
+    def __init__(self, id, uuid, first_name, last_name, birthday, gender, country, size, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
         self.id = id
         self.uuid = uuid
         self.first_name = first_name
         self.last_name = last_name
         self.name = first_name + " " + last_name
-        self.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+        self.birthday = self.parse_date(birthday) 
         self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
+        self.size = size
         self.a1 = AnswerOption.translate_a1(a1) if a1 else None
         self.a2 = AnswerOption.from_str(a2) if a2 else None
         self.a3 = AnswerOption.from_str(a3) if a3 else None
@@ -26,8 +28,35 @@ class Person :
         self.age = self.get_age()
         self.age_group = AgeGroup.from_age(self.age, self.gender)
         
+    def parse_date(self,date_str: str):
+        if not date_str or str(date_str).strip().lower() == "nan":
+            return None
+
+        formats = [
+            "%Y-%m-%d",
+            "%d/%m/%Y",
+            "%m/%d/%Y",
+            "%Y/%m/%d",
+            "%d-%m-%Y",
+            "%d.%m.%Y",
+        ]
+
+        for fmt in formats:
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except:
+                continue
+
+        # fallback
+        try:
+            ## set dayfirst to false if using US date format
+            return parser.parse(date_str, dayfirst=True).date()
+        except:
+            print(f"⚠️ Could not parse date: {date_str}")
+            return None
+        
     def get_age(self) -> int:
-        today = date(2025, 5, 28) # Date of the current camp, change if needed
+        today = date(2026, 4, 30) # Date of the current camp, change if needed
         return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
 
     def __str__(self) -> str:
@@ -47,6 +76,7 @@ class Person :
             'birthday': self.birthday.isoformat(),  # datetime to string
             'gender': self.gender.name,             # Enum to string
             'country': self.country,
+            'size': self.size,
             'a1': self.a1,
             'a2': self.a2.name if self.a2 else None,
             'a3': self.a3.name if self.a3 else None,
@@ -70,6 +100,7 @@ class Person :
             birthday=data['birthday'],
             gender=data['gender'],
             country=data['country'],
+            size=data['size'],
             a1=data['a1'],
             a2=data['a2'],
             a3=data['a3'],

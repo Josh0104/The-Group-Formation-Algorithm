@@ -5,6 +5,7 @@ columns = {
     "birthday": "Birthday",
     "gender": "Gender",
     "country": "Country",
+    "size": "Size",
     "q1" : "Are you willing to be a team leader on your team?", 
     "q2" : "Would you consider yourself a creative thinker?",
     "q3" : "Do you consider yourself knowledgable about the Bible?",

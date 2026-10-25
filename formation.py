@@ -7,11 +7,10 @@ import relations as Relations
 from datetime import datetime
 from person import Person, AgeGroup
 
-def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data, args_solver, args_timeout,args_sizes): 
+def form_teams(people: dict[str, Person], num_teams: int, is_printing_output, args_output_file, args_no_output, args_verbose, relations_data, args_solver, args_timeout,sizes_data): 
 
     # Load data
     campers = list(people.values())
-    num_teams = number_of_groups
     
 
     # Extract attributes from campers
@@ -50,6 +49,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     avg_babies = sum(babies) / num_teams
     
     if args_solver is not None:
+        print(args_solver)
         m = Model(solver_name=args_solver)
     else:
         m = Model('GRB')
@@ -83,6 +83,28 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     plus_minus = 2 # Allowable deviation from average team size
     min_team_size = int(avg_team_size - plus_minus) # Minimum team size (±)
     max_team_size = int(avg_team_size + plus_minus) # Maximum team size (±)
+    
+    # a set of all sizes
+    all_sizes = None
+    if sizes_data:
+        all_sizes = sorted({size_label for (size_label, _) in sizes_data})
+    
+    # Calculate the size of each team
+    # team_size[t] = number of campers assigned to team t
+    team_size = {
+        t: xsum(x[c][t] for c in camper_ids)
+        for t in teams
+    }
+
+    # Penalty variables
+    # d_plus[t]  = how much team t exceeds the allowed max size
+    # d_minus[t] = how much team t is below the allowed min size
+    # lb=0 ensures these values cannot be negative
+    d_plus = {t: m.add_var(lb=0) for t in teams}
+    d_minus = {t: m.add_var(lb=0) for t in teams}
+
+    # Allowed deviation from average team size (±2)
+    delta = 2
 
     # Balance constraints per skill
     # imbalance ≥ absolute difference between actual skill in team and average skill.
@@ -115,8 +137,31 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
         m += babies_imbalance[t] >= xsum(babies[c] * x[c][t] for c in camper_ids) - avg_babies
         m += babies_imbalance[t] >= avg_babies - xsum(babies[c] * x[c][t] for c in camper_ids)
 
-        m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
-        m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
+        # Hard constraint in team size
+        # m += xsum(x[c][t] for c in camper_ids) >= min_team_size # Team size constraint (±)
+        # m += xsum(x[c][t] for c in camper_ids) <= max_team_size # Team size constraint (±)
+        
+        # Soft constraint in team size
+        # If team is too big:
+        # team_size > avg + delta → d_plus captures the extra amount
+        m += team_size[t] - (avg_team_size + delta) <= d_plus[t]
+
+        # If team is too small:
+        # team_size < avg - delta → d_minus captures the missing amount
+        m += (avg_team_size - delta) - team_size[t] <= d_minus[t]
+        
+    
+    if sizes_data: # if size_data is not None then add this contraint
+        print("Sizes constraint added")
+        for size_label in all_sizes:
+            for team_id in teams:
+                m += xsum(
+                    x[c][team_id]
+                    for c in camper_ids
+                    if campers[c].size == size_label
+                ) <= sizes_data[(size_label, team_id)]
+    else:
+        print("Continue without sizes constraint")
 
     epsilon = 0.01
     random_weights = [random.uniform(1 - epsilon, 1 + epsilon) for _ in teams]
@@ -166,6 +211,7 @@ def form_teams(people: dict[str, Person], number_of_groups, is_printing_output, 
     m.optimize()
     
     print(f'Total dataset size: {len(camper_ids)}')
+    print(f'Total groups: {num_teams}')
 
     if m.status == OptimizationStatus.OPTIMAL:
         output_dir = "output"
