@@ -5,11 +5,12 @@ from datetime import datetime
 from mip import BINARY, Model, OptimizationStatus, xsum
 
 from person import Gender, Person
+from src.rooms.rooms import Room
 
 
 def form_rooms(
     people: dict[str, Person],
-    num_rooms: int,
+    rooms: list[Room],
     is_printing_output,
     args_output_file,
     args_no_output,
@@ -17,15 +18,15 @@ def form_rooms(
     args_timeout,
 ):
     """Assign campers to nonempty, single-gender rooms using Gurobi."""
-    if isinstance(num_rooms, bool) or not isinstance(num_rooms, int) or num_rooms < 1:
-        raise ValueError("num_rooms must be a positive integer.")
+    if not rooms:
+        raise ValueError("At least one room is required.")
 
     campers = list(people.values())
     if any(c.gender not in (Gender.MALE, Gender.FEMALE) for c in campers):
         raise ValueError("Every camper must have a male or female gender.")
 
     camper_ids = range(len(campers))
-    rooms = range(num_rooms)
+    room_ids = range(len(rooms))
 
     # Python-MIP builds the mixed integer model; Gurobi solves it.
     m = Model(name="room_formation", solver_name="GRB")
@@ -34,37 +35,43 @@ def form_rooms(
     m.max_seconds = args_timeout
 
     # x[c][r] is 1 exactly when camper c is assigned to room r.
-    x = [[m.add_var(var_type=BINARY) for r in rooms] for c in camper_ids]
+    x = [[m.add_var(var_type=BINARY) for r in room_ids] for c in camper_ids]
     # A room's binary gender is 1 for male and 0 for female.
-    room_is_male = [m.add_var(var_type=BINARY) for r in rooms]
+    room_is_male = [m.add_var(var_type=BINARY) for r in room_ids]
 
     for c in camper_ids:
         # Every camper must be assigned to exactly one room.
-        m += xsum(x[c][r] for r in rooms) == 1
-        for r in rooms:
+        m += xsum(x[c][r] for r in room_ids) == 1
+        for r in room_ids:
             # Sharing one gender variable prevents mixed-gender occupancy.
             if campers[c].gender == Gender.MALE:
                 m += x[c][r] <= room_is_male[r]
             else:
                 m += x[c][r] <= 1 - room_is_male[r]
 
-    for r in rooms:
+    for r in room_ids:
         # Every requested room must contain at least one camper.
         m += xsum(x[c][r] for c in camper_ids) >= 1
+        # The room CSV defines the number of available beds.
+        m += xsum(x[c][r] for c in camper_ids) <= rooms[r].capacity
 
-    # Only feasibility matters; age balance and room capacity are not imposed.
+    # Find any assignment satisfying gender and bed-capacity constraints.
     m.optimize()
 
     print(f"Total dataset size: {len(campers)}")
-    print(f"Total rooms: {num_rooms}")
+    print(f"Total rooms: {len(rooms)}")
 
     # A feasible solution still satisfies the rules if the time limit expires.
     if m.status in (OptimizationStatus.OPTIMAL, OptimizationStatus.FEASIBLE):
-        for r in rooms:
+        for r in room_ids:
+            bed_index = 0
             for c in camper_ids:
                 if x[c][r].x >= 0.99:
                     # Person has no room setter, so store the room locally here.
-                    campers[c].room = r + 1
+                    campers[c].room = rooms[r].id
+                    # Assign each occupant a distinct bed from the room's list.
+                    campers[c].bed = rooms[r].beds[bed_index]
+                    bed_index += 1
 
         if args_no_output is not True:
             output_dir = args_output_file if args_output_file is not None else "output"
@@ -82,9 +89,9 @@ def form_rooms(
             print(f"Output saved to: {output_path}")
 
         if is_printing_output:
-            for r in rooms:
-                room_members = [c for c in campers if c.room == r + 1]
-                print(f"\nRoom {r + 1} - Total: {len(room_members)}")
+            for room in rooms:
+                room_members = [c for c in campers if c.room == room.id]
+                print(f"\n{room.name} - Total: {len(room_members)}")
                 for member in room_members:
                     print(f"  {member.first_name} {member.last_name}")
 

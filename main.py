@@ -5,12 +5,15 @@ import formation as fm
 import gui.main_view as gui
 import app_config
 from pdf_export import export_teams_pdf
+from src.rooms import formation as room_formation
 
 
 def args_parser():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--input", help="File input to read", type=str)
+    parser.add_argument("-i", "--input", help="Path to campers CSV", type=str)
+    parser.add_argument("--rooms", help="Path to room CSV (room formation only)",
+                        default="data/rooms/rooms.csv", type=str)
     parser.add_argument("-g", "--group", help="Number of groups", type=int)
     parser.add_argument("-p", "--print", help="Print the output", action="store_true")
     parser.add_argument("-o", "--output", help="Path for output file, default is ./output", type=str)
@@ -21,6 +24,8 @@ def args_parser():
     parser.add_argument("--timeout", help="Timeout in seconds", type=int, default=120)
     parser.add_argument("--relations", help="Path to relations data", type=str)
     parser.add_argument("--sizes", help="Path to size.csv",type=str)
+    parser.add_argument("--formation", help="Run which formation algorithm, default is teams formation", type=str, choices=["teams", "rooms"], default="teams")
+
 
     args = parser.parse_args()
     app_config.args = args 
@@ -85,12 +90,40 @@ def run_formation(relations_data, sizes_data = None):
 
     return campers
 
+def run_room_formation():
+    from app_config import args  # access shared args
+    from src.rooms.rooms import read_rooms_csv
+
+    try:
+        dict_uuid_person = cr.read_csv_pd(args.input)
+        rooms = read_rooms_csv(args.rooms)
+
+    except FileNotFoundError as fnfe:
+        print(fnfe)
+        exit(1)
+    except TypeError as te:
+        print(te)
+        exit(1)
+
+    return room_formation.form_rooms(
+        dict_uuid_person,
+        rooms,
+        args.print,
+        args.output,
+        args.no_output,
+        args.verbose,
+        args.timeout
+    )
+
 
 def main():
     args = args_parser()
 
     if args.no_gui:
-        run_formation([])
+        if args.formation == "teams":
+            run_formation([])
+        elif args.formation == "rooms":
+            run_room_formation()
     else:
         gui.run_gui()
 
