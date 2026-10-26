@@ -81,9 +81,13 @@ def form_rooms(
 
             with open(output_path, "w", newline="") as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(["ID", "First name", "Last name", "Room"])
+                writer.writerow(
+                    ["ID", "First name", "Last name", "Room", "Sleeping arrangement"]
+                )
                 writer.writerows(
-                    [c.uuid, c.first_name, c.last_name, c.room] for c in campers
+                    [c.uuid, c.first_name, c.last_name, c.room,
+                     f"{c.bed.name.title()} bunk"]
+                    for c in campers
                 )
 
             print(f"Output saved to: {output_path}")
@@ -93,7 +97,10 @@ def form_rooms(
                 room_members = [c for c in campers if c.room == room.id]
                 print(f"\n{room.name} - Total: {len(room_members)}")
                 for member in room_members:
-                    print(f"  {member.first_name} {member.last_name}")
+                    print(
+                        f"  {member.first_name} {member.last_name}"
+                        f" - {member.bed.name.title()} bunk"
+                    )
 
         return campers
 
