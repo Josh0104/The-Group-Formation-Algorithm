@@ -2,6 +2,7 @@
 from datetime import date, datetime
 from enum import Enum
 from dateutil import parser
+from src.rooms.rooms import BedStyle
 
 class Person :
     def __init__(self, id, uuid, first_name, last_name, birthday, gender, country, size, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
@@ -11,6 +12,8 @@ class Person :
         self.last_name = last_name
         self.name = first_name + " " + last_name
         self.birthday = self.parse_date(birthday) 
+        if self.birthday is None:
+            raise ValueError(f"Invalid birthday for {self.name}: {birthday!r}")
         self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
         self.size = size
@@ -24,7 +27,9 @@ class Person :
         self.a8 = AnswerOption.from_str(a8) if a8 else None
         self.a9 = a9
         self.a10 = a10
-        self.team = None
+        self.team: int | None = None
+        self.room: int | None = None
+        self.bed: BedStyle | None = None
         self.age = self.get_age()
         self.age_group = AgeGroup.from_age(self.age, self.gender)
         
@@ -56,6 +61,8 @@ class Person :
             return None
         
     def get_age(self) -> int:
+        if self.birthday is None:
+            raise ValueError(f"Cannot calculate age without a birthday for {self.name}.")
         today = date(2026, 4, 30) # Date of the current camp, change if needed
         return today.year - self.birthday.year - ((today.month, today.day) < (self.birthday.month, self.birthday.day))
 
@@ -73,7 +80,7 @@ class Person :
             'uuid': self.uuid,
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'birthday': self.birthday.isoformat(),  # datetime to string
+            'birthday': self.birthday.isoformat() if self.birthday else None,
             'gender': self.gender.name,             # Enum to string
             'country': self.country,
             'size': self.size,

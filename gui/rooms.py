@@ -7,3 +7,4 @@ def rooms():
 
     with ui.column().classes("items-center w-full"):
         ui.label('🛏️ Room Management').classes('text-3xl font-bold align-center mt-4')
+        ui.button("Run Room Formation", on_click=lambda: ui.notify("Room formation process started!")).classes('mt-4')

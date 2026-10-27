@@ -47,11 +47,11 @@ def form_rooms(
             if campers[c].gender == Gender.MALE:
                 m += x[c][r] <= room_is_male[r]
             else:
-                m += x[c][r] <= 1 - room_is_male[r]
+                m += x[c][r] <= 1 - room_is_male[r] # type: ignore
 
     for r in room_ids:
         # Every requested room must contain at least one camper.
-        m += xsum(x[c][r] for c in camper_ids) >= 1
+        m += xsum(x[c][r] for c in camper_ids) >= 1  # type: ignore[operator]
         # The room CSV defines the number of available beds.
         m += xsum(x[c][r] for c in camper_ids) <= rooms[r].capacity
 
@@ -66,7 +66,8 @@ def form_rooms(
         for r in room_ids:
             bed_index = 0
             for c in camper_ids:
-                if x[c][r].x >= 0.99:
+                assignment = x[c][r].x
+                if assignment is not None and float(assignment) >= 0.99:
                     # Person has no room setter, so store the room locally here.
                     campers[c].room = rooms[r].id
                     # Assign each occupant a distinct bed from the room's list.
@@ -86,7 +87,7 @@ def form_rooms(
                 )
                 writer.writerows(
                     [c.uuid, c.first_name, c.last_name, c.room,
-                     f"{c.bed.name.title()} bunk"]
+                     f"{c.bed.name.title()} bunk" if c.bed is not None else "Unassigned"]
                     for c in campers
                 )
 
@@ -99,7 +100,7 @@ def form_rooms(
                 for member in room_members:
                     print(
                         f"  {member.first_name} {member.last_name}"
-                        f" - {member.bed.name.title()} bunk"
+                        f" - {member.bed.name.title() + ' bunk' if member.bed is not None else 'Unassigned'}"
                     )
 
         return campers
