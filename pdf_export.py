@@ -17,6 +17,7 @@ from reportlab.platypus import (
     TableStyle,
     KeepTogether,
     PageBreak,
+    Flowable,
 )
 from iso3166 import countries
 
@@ -188,7 +189,7 @@ def build_summary_table(
     styles: dict[str, ParagraphStyle],
 ) -> Table:
     """Build the first overview table showing totals per team."""
-    header = [
+    header: list[str | int] = [
         "Team",
         "Total",
         "Men",
@@ -206,7 +207,7 @@ def build_summary_table(
         "Props",
     ]
 
-    rows = [header]
+    rows: list[list[str | int]] = [header]
 
     for team_number, _members in grouped_teams.items():
         stats = team_stats[team_number]
@@ -252,7 +253,7 @@ def build_overview_all_teams_section(
 ) -> KeepTogether:
     """Build a section that gives an overview of all teams (members in columns)."""
 
-    content = [Paragraph("Team Overview", styles["section_title"])]
+    content: list[Flowable] = [Paragraph("Team Overview", styles["section_title"])]
 
     # Column headers → Team 1, Team 2, ...
     team_numbers = list(grouped_teams.keys())
@@ -343,7 +344,7 @@ def build_team_stats_table(stats: dict[str, int]) -> Table:
 
 def build_members_table(members: list[Person]) -> Table:
     """Detailed member table for one team."""
-    rows = [[
+    rows: list[list[object]] = [[
         "#",
         "First name",
         "Last name",

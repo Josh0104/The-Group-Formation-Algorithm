@@ -4,6 +4,7 @@ from enum import Enum
 from dateutil import parser
 from src.rooms.rooms import BedStyle
 
+
 class Person :
     def __init__(self, id, uuid, first_name, last_name, birthday, gender, country, size, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10):
         self.id = id
@@ -17,14 +18,16 @@ class Person :
         self.gender = Gender.MALE if gender == "Male" else Gender.FEMALE
         self.country = country
         self.size = size
-        self.a1 = AnswerOption.translate_a1(a1) if a1 else None
-        self.a2 = AnswerOption.from_str(a2) if a2 else None
-        self.a3 = AnswerOption.from_str(a3) if a3 else None
-        self.a4 = AnswerOption.from_str(a4) if a4 else None
-        self.a5 = AnswerOption.from_str(a5) if a5 else None
-        self.a6 = AnswerOption.from_str(a6) if a6 else None
-        self.a7 = AnswerOption.from_str(a7) if a7 else None
-        self.a8 = AnswerOption.from_str(a8) if a8 else None
+        if not a1:
+            raise ValueError(f"Invalid answer for a1 for {self.name}: {a1!r}")
+        self.a1 = AnswerOption.translate_a1(a1)
+        self.a2 = AnswerOption.from_str(a2)
+        self.a3 = AnswerOption.from_str(a3)
+        self.a4 = AnswerOption.from_str(a4)
+        self.a5 = AnswerOption.from_str(a5)
+        self.a6 = AnswerOption.from_str(a6)
+        self.a7 = AnswerOption.from_str(a7)
+        self.a8 = AnswerOption.from_str(a8)
         self.a9 = a9
         self.a10 = a10
         self.team: int | None = None
@@ -136,8 +139,10 @@ class AnswerOption(Enum):
             return AnswerOption.YES
         elif value.lower() == "maybe":
             return AnswerOption.MAYBE
-        else:
+        elif value.lower() == "no":
             return AnswerOption.NO
+        else:
+            raise ValueError(f"Invalid answer option: {value}")
         
     @staticmethod
     def translate_a1(answer) -> 'AnswerOption':
