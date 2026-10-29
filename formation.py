@@ -1,3 +1,6 @@
+# pyright: reportOperatorIssue=false
+# mip annotates operands as numbers.Real, which Pyright does not match to int/float,
+# so every `coef * var` / `expr - avg` is falsely flagged. The arithmetic is valid at runtime.
 from mip import Model, xsum, BINARY, OptimizationStatus
 import os
 import time
@@ -84,11 +87,6 @@ def form_teams(people: dict[str, Person], num_teams: int, is_printing_output, ar
     min_team_size = int(avg_team_size - plus_minus) # Minimum team size (±)
     max_team_size = int(avg_team_size + plus_minus) # Maximum team size (±)
     
-    # a set of all sizes
-    all_sizes = None
-    if sizes_data:
-        all_sizes = sorted({size_label for (size_label, _) in sizes_data})
-    
     # Calculate the size of each team
     # team_size[t] = number of campers assigned to team t
     team_size = {
@@ -99,9 +97,9 @@ def form_teams(people: dict[str, Person], num_teams: int, is_printing_output, ar
     # Penalty variables
     # d_plus[t]  = how much team t exceeds the allowed max size
     # d_minus[t] = how much team t is below the allowed min size
-    # lb=0 ensures these values cannot be negative
-    d_plus = {t: m.add_var(lb=0) for t in teams}
-    d_minus = {t: m.add_var(lb=0) for t in teams}
+    # add_var's default lb=0 ensures these values cannot be negative
+    d_plus = {t: m.add_var() for t in teams}
+    d_minus = {t: m.add_var() for t in teams}
 
     # Allowed deviation from average team size (±2)
     delta = 2
@@ -153,6 +151,8 @@ def form_teams(people: dict[str, Person], num_teams: int, is_printing_output, ar
     
     if sizes_data: # if size_data is not None then add this contraint
         print("Sizes constraint added")
+        # a set of all sizes
+        all_sizes = sorted({size_label for (size_label, _) in sizes_data})
         for size_label in all_sizes:
             for team_id in teams:
                 m += xsum(
@@ -221,7 +221,8 @@ def form_teams(people: dict[str, Person], num_teams: int, is_printing_output, ar
 
         for t in teams:
             for c in camper_ids:
-                if x[c][t].x >= 0.99:
+                assignment = x[c][t].x
+                if assignment is not None and float(assignment) >= 0.99:
                     camper = campers[c]
                     camper.set_team(t + 1)
 
