@@ -1,8 +1,6 @@
 import csv
 from enum import Enum
 
-from person import Gender
-
 
 class Room:
     def __init__(self, id, name, capacity):
